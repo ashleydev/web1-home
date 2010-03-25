@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+# Used to administer w2k stuff
+
+use strict;
+use v5.10.0;
+
+my $arg = shift(@ARGV);
+
+unless ($arg) {
+
+  print 
+"Purpose: To do various functions on the W2K-TBM machine
+
+Usage: $0 [option]
+
+Available arguments:
+\tremount -- old, may not be used anymore due to eric's sshfs filesystem mount
+
+";
+
+} else {
+  
+  given ($arg) {
+
+    when ('remount') {
+      system("sudo /home/pubstock/perl/kill_mnt_tbm_pids.sh");
+      system("sudo /home/pubstock/perl/remount_w2k_drive.sh");
+    }
+
+  } # end of given
+
+}

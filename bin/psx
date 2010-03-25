@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+
+use strict;
+use constant DEBUG => 0;
+
+# START ---------------------- 
+
+my $query = $ARGV[0];
+
+if ($query) {
+
+  my $query_refined = $query;
+  $query_refined =~ s/^./\[$&\]/;
+
+  print "Generated string: $query_refined\n" if DEBUG;
+
+  exec("ps aux | grep -i --color=always $query_refined | grep -v sshd | grep -v $0");
+
+} else {
+  print "Purpose: To do a [33mps aux | grep [query][00m easier.\n\n";
+  print "Note: Purposely removes anything with \"sshd\" in it.\n\n";
+  print "Usage: $0 [search_query]\n\n";
+}

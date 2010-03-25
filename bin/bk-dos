@@ -1,0 +1,141 @@
+#!/usr/bin/perl
+
+use String::Strip;
+use Data::Dumper;
+use File::Basename;
+use Cwd qw(realpath);
+
+use strict;
+
+
+# START ---------------------- 
+
+my $flag_web2; # safe!
+my $flag_web2_blurb;
+my $flag_file;
+my $flag_file_include;
+my $flag_no_permission;
+
+if (exists($ARGV[0])) {
+
+# meat and potatos
+
+my @file_list;
+my @down_list;
+my @up_list;
+my @up_list_no_permission;
+
+my $file_count = 0;
+my $arg_count = 0;
+
+foreach (@ARGV) {
+
+  if ($_ eq "1") {
+    $flag_web2 = undef; # used as a shortcut to write text easier
+  }
+
+  elsif ($_ eq "2") {
+    $flag_web2 = 2; # used as a shortcut to write text easier
+    $flag_web2_blurb = "(web2) ";
+  }
+
+  elsif ($_ eq '-f' && exists($ARGV[$arg_count + 1])) {
+    $flag_file = $ARGV[$arg_count + 1];
+  }
+
+  elsif ($_ eq '-p') {
+    $flag_no_permission = 1; # does not toggle, forces it to true
+  }
+
+  elsif ($_ eq '-i') {
+    $flag_file_include = 1; # does not toggle, forces it to true
+  }
+
+  elsif ( -f $_ ) {
+    push (@file_list, $_);
+  }
+
+  $arg_count++;
+
+}
+
+if ( -f $flag_file ) {
+
+  @file_list = ();
+
+  if ($flag_file_include) { push (@file_list, $flag_file); }
+
+  open (FH, $flag_file);
+
+  while (<FH>) {
+
+    StripLTSpace($_);
+    push (@file_list, $_);
+  }
+
+}
+
+foreach (@file_list) {
+
+  $file_count++;
+
+  my $path = realpath(dirname($_));
+  my $filename = basename($_);
+
+  push(@down_list, "call down$flag_web2 $path/$filename");
+
+  if ($flag_no_permission) {
+
+    my $tmp_dir = '/tmp/sjohnson';
+
+    push(@up_list, "call up$flag_web2 $filename $tmp_dir");
+    push(@up_list_no_permission, "mv $tmp_dir/$filename $path");
+
+  } else {
+    push(@up_list, "call up$flag_web2 $filename $path");
+  }
+
+}
+
+if ($file_count) {
+
+  #system('clear');
+
+  print "\n";
+
+  print ("[33mREM --- MS-DOS compatible downloader $flag_web2_blurb---[00m\n");
+  print ('@echo off'."\n");
+  foreach (@down_list) {
+    print "$_\n";
+  }
+
+  print "\n";
+
+  print ("[33mREM --- MS-DOS compatible uploader $flag_web2_blurb---[00m\n");
+  print ('@echo off'."\n");
+  foreach (@up_list) {
+    print "$_\n";
+  }
+
+  if ($flag_no_permission) {
+
+    print "\n";
+
+    print ("[33m# --- Unix mv commands ---[00m\n");
+    foreach (@up_list_no_permission) {
+      print "$_\n";
+    }
+
+  }
+
+## END OF MEAT AND POTATOES
+
+  print "\n";
+
+}
+
+##END##
+} else {
+  print "Purpose:  To make MS-DOS compatible batch files for easy uploading and downloading.  Outputs text only.\n\n";
+  print "Usage: $0 (2) (-f backuplist)|[file1 .. file2 .. file 3 ..]\n";
+}

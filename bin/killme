@@ -1,0 +1,5 @@
+#!/bin/sh
+
+ps_safe=`ps | grep bash | awky 1`
+ps u | grep [b]ash | grep -v $ps_safe | awky 2 | xargs kill -9
+unset ps_safe

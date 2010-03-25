@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+
+#use Acme::Comment type=>'C++';
+#use String::Strip;
+
+use strict;
+
+
+# START ---------------------- 
+
+if ($ARGV[1]) {
+
+my $mask_cmd = $ARGV[0];
+my $text = $ARGV[1];
+
+my $mask = `$mask_cmd`;
+my $text = `cat $text`;
+
+my $char_mask;
+my $char_text;
+
+my $pos_mask = 0;
+my $pos_text = 0;
+
+my $limit = (length($text) > length($mask))? length($mask) : length($text);
+
+for (1..$limit) {
+
+  $char_mask = substr($mask,$pos_mask,1);
+  $pos_mask++;
+
+  if ($char_mask eq "\n" || $char_mask eq " " || $char_mask eq "\t") {
+  #if ($char_mask eq "\n") {
+    print $char_mask;
+    #print ".";
+    next;
+  } else {
+
+    #if ($char_text ne "\n" || $char_text =~ m/ /) {
+    
+    my $success = 0;
+
+    do {
+      $char_text = substr($text,$pos_text,1);
+      $pos_text++;
+
+      if ($char_text ne "\n" && $char_text ne " " && $char_text ne "\t") {
+	$success = 1;
+      }
+      
+    } while (!$success && ($pos_text < length($text)));
+
+    print $char_text if $success;
+
+    }
+
+} 
+
+##END##
+
+print "\n";
+
+} else {
+  print "Usage: $0 [mask command] [textfile]\n";
+  print "\n";
+  print "\tExample: $0 'man vi' goodfile.txt\n";
+  print "\n";
+}

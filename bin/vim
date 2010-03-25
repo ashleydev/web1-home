@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+
+use strict;
+use v5.10.0;
+
+use Cwd qw(realpath);
+
+my @vim_files;
+my @vim_args;
+my @lost_and_found;
+
+# KNOWN ISSUES, PLEASE READ
+# 1. this will only edit the realpath of the file if it already exists.   this is show it shows up easier in the process list
+# 2. even though there are lists at the top of this file declared, they are lists in case someday Eric or Mike B want the functionality changed
+#    to allow multiple editing.  If you would like to do that, make sure exec is switched to system and a foreach put in place
+
+foreach (@ARGV) {
+  
+  my ($pre_colon, $post_colon) = split(/:/);
+
+  # disallow directories
+  if (-d $_) {
+    say "$_ is a directory.";
+    exit(1);
+  } elsif (-d $pre_colon) {
+    say "$pre_colon is a directory.";
+    exit(1);
+
+  } elsif (-f $_) {
+    push(@vim_files, { file => $_, line => 1 });
+  } elsif (-f $pre_colon && $post_colon =~ m/^[0-9]+$/) {
+    push(@vim_files, { file => $pre_colon, line => $post_colon});
+  } elsif (m/^(\+|-)/) {
+    push(@vim_args, $_);
+  } else {
+    push(@lost_and_found, $_);
+  }
+
+}
+
+if (my $hashref_file_data = shift(@vim_files)) {
+  my $file = $hashref_file_data->{file};
+  my $line = $hashref_file_data->{line};
+
+  unshift(@vim_args, "+$line") if ($line > 1);
+
+  my $cmd = "vi ".realpath($file)." @vim_args";
+  exec($cmd);
+} elsif (my $first_and_only_try = shift(@lost_and_found)) {
+  system("vi $first_and_only_try @vim_args");
+} else {
+  system("vi @vim_args");
+}

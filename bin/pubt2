@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# Use this to create a working Perl file with some comments to save time.
+
+# the 2 in the name is cause of Eric's habit of putting 2 after damn near everything he does
+
+#if [ -n "$2" ]
+if [ -n "$1" ]
+then
+
+	#cd /home/pubstock/perl && sudo -u pubstock perl $3 -Ilib test_file2.pl $1 $2
+	echo "cd /home/pubstock/perl && sudo -u pubstock perl -Ilib test_file2.pl $1 $2"
+	cd /home/pubstock/perl && sudo -u pubstock perl -Ilib test_file2.pl $1 $2
+	#TMP=$PWD ; cd /home/pubstock/perl && sudo -u pubstock perl $3 -Ilib test_file2.pl $1 $2 ; cd $TMP
+
+else
+	echo Purpose:  To do a dry run of a file under a specified handler
+	echo
+	#echo Usage: $0 '[file] [handler_type] (perl arguments)'
+	echo Usage: $0 '[file WITHOUT the directory, it will find the interm file] (extra param)'
+	echo
+	echo "\tex: $0 OUP-0123456789.tmp Pubstock::Title::Ex3"
+	echo "\tex: $0 OUP-0123456789.tmp"
+	echo "\tex: $0 OUP-0123456789.tmp Pubstock::Combo::ONIXXML2"
+	echo
+fi

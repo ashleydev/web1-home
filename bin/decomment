@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+use strict;
+
+while (<STDIN>) {
+  
+  my $permission_to_print = 0;
+
+  if (m/^\s*#/) { 
+    # no printing
+  } elsif (m/^\s*\/\//) {
+    # no printing
+  } else {
+    $permission_to_print = 1;
+  }
+
+  if ($permission_to_print) {
+    print "$_";
+  }
+}

@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+
+use strict;
+
+my $file = shift(@ARGV);
+my $position = shift(@ARGV);
+
+unless ($file && $position) {
+  print "$0 [file] [position by byte]\n";
+  exit(1);
+}
+
+open(READ, $file);
+
+my $char_count = 0;
+my $line_count = 0;
+
+while (<READ>) {
+  $line_count++;
+
+  my $rawline = $_;
+  my $chomped_line = $rawline; chomp($chomped_line);
+
+  if (($char_count <= $position) && $position <= $char_count+length($rawline)) {
+    print "$line_count: $chomped_line\n";
+    exit(0);
+  }
+
+  $char_count+=length($rawline);
+
+}
+
+print "Byte $position not found\n";
+exit(2);

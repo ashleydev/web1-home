@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+
+use v5.10.0;
+use strict;
+
+foreach (@ARGV) {
+  
+  if (-f $_) {
+    my $output_file = `file '$_'`;
+
+    my $extract_arg;
+    given($output_file) {
+      when (/bzip2/) { $extract_arg = 'j'; }
+      when (/gzip/) { $extract_arg = 'z'; }
+    }
+
+    if ($extract_arg) {
+      my $cmd = "tar x".$extract_arg."vf '$_'";
+      system($cmd);
+    } else {
+      print "Not a tar archive.\n";
+      exit(1);
+    }
+
+  } else {
+    print "$_ not a file.  Skipping.\n";
+  }
+
+}

@@ -1,0 +1,169 @@
+#!/usr/bin/perl
+
+use Sort::Key qw(nkeysort);
+use Data::Types;
+
+#KNOWN ISSUE: relies on nkeysort from CPAN... could perhaps find a workaround
+
+use strict;
+
+# How to use (examples):
+# 
+# # number the output of all lines
+# ls -l | lg
+# lg [file]
+# 
+# # grab a single line
+# ls -l | lg 3
+# lg [file] 3
+
+# # grab lines 13 to 50 and print them out from a file
+# lg [file] 13 50
+# lg 13 50 [file] 
+# 
+# # grab lines 13 to 50 and print them out from stdin
+# ls -l | lg 13 50
+# ls -l | lg 50 13
+# 
+# # toggle color flag on line# output
+# ls -l | lg 50 13 -c
+# 
+# # toggle line# printing
+# ls -l | lg 50 13 -l
+# 
+
+# START ---------------------- 
+
+my $flag_color = 1; # toggle color highlighting
+my $flag_lineprefix = 0;
+my $flag_line_end = 0;
+my $flag_c = 0;
+my $debug = 0; # toggle debug msgs
+
+my $int_file;
+
+my $specified_line;
+my $line_start;
+my $line_end;
+
+my @line_coordinates;
+
+foreach (@ARGV) {
+  if ( -f $_ && !$int_file ) { $int_file = $_; }
+  elsif (Data::Types::is_int ($_)) { push (@line_coordinates, $_); }
+  elsif ($_ eq '-c') { $flag_color = !$flag_color; }
+  elsif ($_ eq '-l') { $flag_lineprefix = !$flag_lineprefix; }
+  elsif ($_ eq 'e') { $flag_line_end = 1; }
+  elsif ($_ eq '-d') { $debug = !$debug; }
+  elsif (m/^-C(\d*)$/) { $flag_c = $1; }
+}
+
+my @line_coordinates_sorted = nkeysort { $_ } @line_coordinates;
+
+# it's only going to take the first two... so if someone puts 20 30 40, it's only going to grab lines 20-30
+$line_start = shift(@line_coordinates_sorted);
+$line_end = shift(@line_coordinates_sorted);
+
+
+# checks to see if the user specified only one line number instead of a range
+
+if ($line_start) {
+
+  if ($line_start && !$line_end && !$flag_line_end) {
+    $line_end = $line_start;
+    $specified_line = $line_start;
+  } elsif (!$line_start) {
+    $flag_line_end = 1;
+  }
+
+  if ($debug) {
+    print "start: $line_start\n"; 
+    print "end: $line_end\n"; 
+    print "file: $int_file\n"; 
+    use Data::Dumper;
+    print Dumper (@line_coordinates_sorted);
+  }
+
+  # grep like arugment... -C# grabs that many lines above AND below
+  if ($flag_c) {
+
+    $flag_lineprefix = 1; # well.. turn on this flag automatically because it's nice to see what line is the original one you searched for
+
+    $line_start -= $flag_c;
+    $line_end += $flag_c;
+  }
+
+
+  my $color_start;
+  my $color_start_c;
+  my $color_end;
+
+  # use linux ESC colour codes
+  if ($flag_color) {
+    $color_start = '[33m';
+    $color_start_c = '[1;31m';
+    $color_end = '[00m';
+  }
+
+
+  # Program asks itself, "STDIN, or a real file?"
+  my $in_handle;
+  if ($int_file) {
+    open(FH, $int_file);
+    $in_handle = "FH";
+  } else {
+    $in_handle = "STDIN";
+  }
+
+  my $i = 1;
+  while (<$in_handle>) {
+
+    print "___".$i if $debug;
+
+    my $print_ok = 0;
+
+    if ($i >= $line_start) {
+      if ($flag_line_end) {
+	  $print_ok = 1;
+	  print "__print_due_to_no_end $i\n" if $debug;
+      } elsif ($i > $line_end) {
+	  print "___stop at line $i\n" if $debug;
+	  last;
+      } else {
+	print "___normal lineprint at $i\n" if $debug;
+	$print_ok = 1;
+      }
+    } else {
+      print "__skipping $i\n" if $debug;
+    }
+
+    # print $color_start.$i.": ".$color_end.$_ if $print_ok;
+    if ($print_ok) {
+      if ($flag_lineprefix) {
+	# if ($i == $specified_line && $flag_c) {
+	# if ($i == $specified_line && $flag_c) {
+	if ($i == $specified_line) {
+	  print $color_start_c; # this color is for the line it was originally searching for
+	} else {
+	  print $color_start;
+	}
+	print $i.":".$color_end."\t";
+      }
+      print $_;
+    }
+
+    $i++;
+
+  }
+
+  ## END
+} else {
+  print "Purpose:  Grabs lines from a file, or STDIN\n\n";
+  print "\tEx: ls -l | lg 3 # line 3 only\n";
+  print "\tEx: ls -l | lg 3 10 # lines 3-10\n";
+  print "\tEx: ls -l | lg 15 -C5 # line lines 10-20\n";
+  print "\tEx: ls -l | lg 15 e # lines 15 to EOF\n";
+  print "\tEx: lg moose.txt 15 e # lines 15 to EOF of moose.txt\n\n";
+  print "Optional flags: -[c]olor, -[d]ebug, -[l]ineprefixes\n";
+  print "\n";
+}

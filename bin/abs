@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+
+use strict;
+use Cwd qw(realpath);
+
+
+
+
+
+my $flag_help;
+
+use String::Strip;
+
+my @files;
+
+foreach (@ARGV) {
+  #if (m/^(--remove-blanks|-b)$/) { $flag_remove_blanks = 1; }
+  #elsif (m/^(--help|-h)$/) { $flag_help = 1; }
+  if (m/^(--help|-h)$/) { $flag_help = 1; }
+  else {
+    push(@files, $_);
+  }
+}
+
+if ($flag_help) {
+
+  print "Purpose:  Returns absolute paths of files\n\n";
+  #print "\tex: $0 --remove-blanks\n";
+  #print "\tex: $0 --b\n\n";
+  print "This help screen\n";
+  print "\tex: $0 --help\n";
+  print "\tex: $0 -h\n";
+  print "\n";
+
+  exit;
+
+} else {
+
+  if ( ! @files ) { 
+
+    while (<STDIN>) {
+      push(@files, $_);
+    }
+  }
+  
+  foreach (@files) {
+    StripLTSpace($_);
+
+    #$_ =~ s/^~/$ENV{HOME}/;
+#    if ( -e $_ ) { # checks files and dirs
+    if ( -f $_ ) { # checks files only
+
+      my $output = realpath($_);
+
+      if ($output) {
+	print $output."\n";
+      }
+
+    } else {
+      #print "no!\n";
+    }
+  }
+
+}
+

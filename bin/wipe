@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+
+use strict;
+use v5.10.0;
+
+unless (@ARGV) {
+  say STDERR "Usage: $0 [file to wipe to 0 bytes]";
+  exit(1);
+}
+
+my $file = shift(@ARGV);
+
+unless (-f $file) {
+  say STDERR "$file doesn't exist.";
+  exit(1);
+}
+
+unless (-w $file) {
+  say STDERR "No write permission for $file.";
+  exit(1);
+}
+
+open(WRITE, ">$file") or die "Cannot open $file"; # opening for write, then closing, will wipe the file to 0 bytes
+close($file);

@@ -1,0 +1,8 @@
+# No need to press <tab> twice anymore
+set show-all-if-ambiguous on
+
+# No more annoying "boonk!" noise!
+set bell-style none
+
+# Sets the threshold before it asks you if you "really want to see all the returned lists"
+set completion-query-items 200

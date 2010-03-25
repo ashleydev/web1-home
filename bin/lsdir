@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+### used in the dev list function
+
+use String::Strip;
+use Data::Dumper;
+use Cwd qw(realpath);
+
+use strict;
+
+# START ---------------------- 
+
+my $cmd = "ls --color=never @ARGV";
+my $ls_raw = qx/$cmd/; chomp $ls_raw;
+
+my @ls = split("\n", $ls_raw);
+
+my @ch_dirs;
+foreach (@ARGV) {
+  if (m/-.*l/) { die ("doesn't support -l in the arg list"); }
+  if ( -d $_) {
+
+    if ( ! scalar(@ch_dirs)) {
+      push (@ch_dirs, realpath($_));
+    } else {
+      die ("implement me to allow more than 1 directory");
+    }
+  }
+}
+
+if ( ! scalar(@ch_dirs)) {
+  my $pwd = `pwd`; chomp $pwd;
+  push (@ch_dirs, realpath($pwd));
+}
+
+foreach (@ch_dirs) { #FIXME depending on implement me above
+  chdir($_);
+  foreach my $ls_listing (@ls) {
+    if ( -d $ls_listing) {
+      print "$ls_listing\n";
+    }
+  }
+}

@@ -1,0 +1,8 @@
+# this script is executed with the . command
+
+if [ ! "$1" ] ; then
+  . /home/sjohnson/bin/cddev /home/http/template/default/h
+else
+  cd /home/sjohnson/rtk
+  /home/sjohnson/rtk/h $*
+fi

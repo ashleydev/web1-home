@@ -1,0 +1,13 @@
+#!/bin/sh
+
+TMP_FILENAME="/tmp/tmpfs/.tmp_man"
+
+if [ "$1" ] ; then
+  /usr/bin/man $1 > $TMP_FILENAME && vi -c "set nomod" $TMP_FILENAME && rm $TMP_FILENAME
+else
+  echo Purpose: Vim paginated man pages!
+  echo
+  echo Usage: $0 '[query]'
+fi
+
+unset TMP_FILENAME

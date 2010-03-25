@@ -1,0 +1,83 @@
+#!/usr/bin/perl
+
+#use String::Strip;
+#use Data::Types;
+
+use strict;
+
+# START ---------------------- 
+my $test;
+my $file;
+my $flag_stdin;
+my $delim;
+
+
+my $tmp_filedir = "/tmp/tmpfs/";
+
+if ( ! -d $tmp_filedir ) { die ("$tmp_filedir doesn't exist!"); }
+my $tmp_filename = ".tmp_awky";
+
+my $file_ram = $tmp_filedir.$tmp_filename;
+
+$file = shift(@ARGV) if ( -f $ARGV[0] );
+$delim = shift(@ARGV) if ($ARGV[0] !~ m/^\d*$/);
+
+if (exists($ARGV[0])) {
+  
+  if ( ! $file ) {
+
+    my $txt;
+    $flag_stdin = 1;
+
+    while (<STDIN>) {
+      $txt .= $_;
+    }
+
+    # directory creation check
+    if ( ! -d $tmp_filedir ) {
+      mkdir($tmp_filedir);
+    }
+
+    open (WH, ">$file_ram");
+
+    print WH $txt;
+
+    $file = $file_ram;
+
+  }
+
+  #print "Running...\n";
+
+  my $awkstring;
+
+  my $i = 0;
+  $awkstring = "'{ print";
+
+  foreach (@ARGV) { 
+    $awkstring .= q( $).$_;
+    $awkstring .= q( " ") if $i < (scalar(@ARGV) - 1);
+    $i++;
+  }
+
+  $awkstring .= q( }');
+
+  #print "$awkstring\n";
+
+  #my $cmd = "cat << AWKY_END | awk "; # the awky_end is probably not necessary, but cat needs to go here... usually most people choose EOF
+  my $cmd = "cat $file | awk "; # the awky_end is probably not necessary, but cat needs to go here... usually most people choose EOF
+  $cmd .= "-F$delim " if $delim;
+  $cmd .= "$awkstring\n";
+
+  system($cmd);
+
+  if ($flag_stdin) {
+    #print "Deleting the temp file...\n";
+    unlink $file_ram;
+  } else {
+    #print "Nothing to delete\n";
+  }
+
+} else {
+  print "Purpose: Shortcut to awk's popular { print } statement\n\n";
+  print "Usage: $0 [file] (delim) [1] (2.. 3.. 4.. etc)\n";
+}

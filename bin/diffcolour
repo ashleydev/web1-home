@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+
+use strict;
+use Term::ANSIColor qw(:constants);
+
+while (<STDIN>) {
+  my $color_on = 0;
+  if (m/^</) { $color_on = 1; print MAGENTA; }
+  elsif (m/^>/) { $color_on = 1; print GREEN; }
+  elsif (m/^---/) { $color_on = 1; print CYAN; }
+  elsif (m/^\d/) { $color_on = 1; print YELLOW; }
+  print;
+  if ($color_on) { print RESET; }
+}

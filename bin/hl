@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+
+use strict;
+use v5.10.0;
+
+use Term::ANSIColor qw(:constants);
+use File::Basename;
+
+use constant DEBUG => 0;
+
+my $flag_insensitive;
+my @subs;
+
+my $highlight_colour = YELLOW;
+my $bold_placeholder;
+
+foreach (@ARGV) {
+  when ("-i") { $flag_insensitive = 1; }
+  when (/^--(color|colour)=(\w+)$/) {
+
+    # allowable colours BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, AND WHITE
+    given ($2) {
+      when (m/^black$/i) { $highlight_colour = BLACK; }
+      when (m/^red$/i) { $highlight_colour = RED; }
+      when (m/^green$/i) { $highlight_colour = GREEN; }
+      when (m/^yellow$/i) { $highlight_colour = YELLOW; }
+      when (m/^blue$/i) { $highlight_colour = BLUE; }
+      when (m/^magenta$/i) { $highlight_colour = MAGENTA; }
+      when (m/^cyan$/i) { $highlight_colour = CYAN; }
+      when (m/^white$/i) { $highlight_colour = WHITE; }
+      default { $highlight_colour = YELLOW; }
+    }
+  }
+
+  #when (/^--no-bold$/) { $bold_placeholder = undef; }
+  when (/^--bold$/) { $bold_placeholder = BOLD; }
+
+  default { push(@subs, $_); }
+}
+
+unless (@subs) {
+  say "Usage: cat process.txt | ".BOLD.basename($0)." (-i) (--colour=red) (--bold) [string1] (string2) ...".RESET;
+  exit(1);
+}
+
+# DEBUG SECTION
+say "@subs" if DEBUG;
+###
+  
+while (my $line = <STDIN>) {
+  foreach (@subs) {
+    if ($flag_insensitive) {
+      $line =~ s{$_}{$bold_placeholder.$highlight_colour.$&.RESET}egi;
+    } else {
+      $line =~ s{$_}{$bold_placeholder.$highlight_colour.$&.RESET}eg;
+    }
+  }
+
+  print $line;
+
+}

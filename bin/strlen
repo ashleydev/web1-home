@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+
+use strict;
+use Term::ANSIColor qw(:constants);
+use v5.10.0;
+
+# START ---------------------- 
+
+my $param = $ARGV[0];
+if ($param) {
+  say BOLD, YELLOW, length($param), RESET;
+} else {
+  while (<STDIN>) {
+    chomp;
+    say BOLD, YELLOW, length, RESET;
+    print "\n";
+  }
+}

@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+
+use strict;
+
+
+
+
+
+
+
+
+
+# START ---------------------- 
+
+
+my @buffer;
+
+while (<>) {
+  if (m/(\d{2}:\d{2}:\d{2}.*?)\s+.\s+$/) {
+    push (@buffer, $1);
+  }
+}
+
+foreach (@buffer) {
+  print "$_\n";
+}

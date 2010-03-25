@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# To copy interm files without any wasted params into a new filename in the current directory.
+
+if [ -n "$1" ]
+then
+
+	if [ -e "/home/pubstock/interm/$1" ]
+	then
+	  #cp /home/pubstock/interm/$1 ./$2 && ls -l $2 | tail -n1
+	  cp /home/pubstock/interm/$1 ./$2
+	else
+	  echo Error!  Cannot find $1
+	fi
+
+else
+	echo Purpose:  Copies a file from the Pubstock interm/ folder
+	echo
+	echo Usage: $0 '[ABC-0123456789-0.tmp] ./(newname)'
+fi

@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+
+my $buffer;
+
+while (<>) {
+  s{(\w+)}{ucfirst($1)}eg;
+  $buffer .= $_;
+}
+
+print $buffer;

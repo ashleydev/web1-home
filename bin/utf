@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if [ -f "$2" ] ; then
+
+vim -e -c "set fileencoding=utf-$1" -c "w" -c "q" $2 > /dev/null
+
+else
+  echo Purpose: Converts a file to UTF-16 using Vim
+  echo
+  echo Usage: $0 [file]
+fi

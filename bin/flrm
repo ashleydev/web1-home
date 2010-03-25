@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+
+# FIXME : someday, make this a universal bin utility for myself to just pick out lines.  print to STDOUT or save the file?
+use strict;
+
+my $flag_atLeastOneDelete;
+
+my $filename_filelist = "./filelist";
+
+if (@ARGV) {
+
+  open(READ, $filename_filelist) or die ("can't read $filename_filelist!");
+
+  my $filelist_new;
+
+  my $i = 0;
+  while (<READ>) {
+    $i++;
+    if (grep(/^$i$/, @ARGV)) {
+      # do nothing on purpose
+      $flag_atLeastOneDelete = 1;
+    } else {
+      $filelist_new .= $_;
+    }
+  }
+
+  close(READ);
+
+  if ($flag_atLeastOneDelete) {
+    open(WRITE, ">$filename_filelist") or die ("can't write to $filename_filelist!");
+    print WRITE $filelist_new;
+    close(WRITE);
+  }
+
+  ##END##
+} else {
+  print "Purpose: Remove from the $filename_filelist file entries by line number\n\n";
+  print "Usage: $0 2 4 7 \n";
+}

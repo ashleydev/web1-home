@@ -1,0 +1,11 @@
+#!/usr/bin/perl
+
+# used for getting the absolute paths from grep
+# Nov17-2009:  found that it acts strange when color grep is piped to it
+
+use Cwd qw(realpath);
+
+while (<STDIN>) {
+  s/(\S+):/realpath($1).':'/e;
+  print;
+}

@@ -1,0 +1,115 @@
+#!/usr/bin/perl
+
+# To make git commits more habitual
+
+use strict;
+use String::Strip;
+
+if (exists($ARGV[0])) {
+
+  #my $param1 = $ARGV[0]; # Grabs the first parameter... /usr/bin/goose.pl for example
+  my $param1 = shift(@ARGV); # Grabs the first parameter... /usr/bin/goose.pl for example
+
+  my $param2;
+
+  my $flag_forceedit;
+  my $flag_forcecommit;
+
+  my $flag_line_to_edit;
+
+  my $flag_commit_message;
+  my $commit_message;
+
+  my $i=0;
+
+  foreach (@ARGV) {
+    if (m/^!$/) {
+      $flag_forceedit = 1;
+    } elsif (m/^--line-number=(\d+)$/) {
+      $flag_line_to_edit = $1;
+    } else { #committing section shortcut, no editing
+
+      if (m/c/) { $flag_forcecommit = 1; }
+      if ((m/m/) && ($ARGV[$i+1]) ) {
+	#$flag_forcecommit = 1;
+	$flag_commit_message = 1;
+	$commit_message = $ARGV[$i+1];
+	$ARGV[$i+1] = undef;
+      }
+
+      
+
+    }
+    $i++; # step up the forloop iterator
+  }
+
+  if ($ARGV[1]) {
+    $param2 = $ARGV[1];
+  }
+
+
+  my $regex_md5 = '^(\S{32})';
+
+  my $path;
+  my $filename;
+
+  my $regex_path = '^(.+?)([^/]*)$';
+
+  if ($param1 !~ m/\//) {
+    $path = './';
+    $filename = $param1;
+  } else {
+    ($path, $filename) = $param1 =~ m/$regex_path/; 
+  }
+
+  # print "Path: $path\nFilename: $filename\n\n";
+
+  chdir($path);
+
+  my $decision_to_commit;
+
+  if ( ! $flag_forcecommit ) {
+
+    my ($md5_1) = `md5sum $filename` =~ m/$regex_md5/; # Grabs first MD5
+
+    my $diff = `git diff $filename`;
+    StripLTSpace($diff); # Backticks usually return \n's and git diff also does some weird newline shit on top of that.
+
+    if ($diff && !$flag_forceedit) {
+      print $diff;
+      print "\n";
+    } else {
+
+      my $arguments;
+
+      if ($flag_line_to_edit) {
+	$arguments .= " +$flag_line_to_edit";
+      }
+
+      StripLTSpace($arguments);
+
+      system("vi $filename $arguments");
+      my ($md5_2) = `md5sum $filename` =~ m/$regex_md5/; # Grabs second MD5
+
+      if ($md5_1 eq $md5_2) {
+	# print "No changes detected.\n";
+      } else {
+	$decision_to_commit = 1;
+      }
+    }
+
+  }
+
+  if ($decision_to_commit || $flag_forcecommit) { # if the program decides that a commit is needed, OR the force commit flag is set, commit
+    my $cmd_commit = "git commit";
+    if ($flag_commit_message && $commit_message) { # just to be safe. Not really necessary to check the commit message.. but who's counting?
+      $cmd_commit .= " -m '$commit_message'";
+    }
+    $cmd_commit .= " $filename";
+    system($cmd_commit); # if they're different, then commit the changes
+    #print("$cmd_commit\n"); # if they're different, then commit the changes
+  }
+
+} else {
+  print "Usage: $0 [file] (!)\n";
+}

@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# changes ^M's to new lines
+
+if [ -f "$1" ] ; then
+  cat "$1" | sed -e 's//\n/g' > "$1.fixed"
+  if [ -s "$1.fixed" ] ; then
+    rm "$1" && mv "$1.fixed" "$1"
+  else
+    echo Something fucked up
+  fi
+else
+  echo Purpose: Turns ^M''s into newlines when all else fails.  Will mutate the file.
+  echo
+  echo Usage: $0 [file]
+fi

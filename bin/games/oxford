@@ -1,0 +1,154 @@
+#!/usr/bin/perl
+
+#use String::Strip;
+use Data::Dumper;
+use List::Util qw(shuffle);
+
+#@chars = split(//, $word);
+#@sentences = split(/\./, $paragraph);
+
+
+use strict;
+
+while (<STDIN>) {
+  chomp;
+
+  my @words = split(/ /, $_);
+
+  my @words_jumbled;
+  foreach (@words) {
+    push(@words_jumbled,  jumbleWord($_));
+  }
+
+  print join(' ', @words_jumbled)."\n";
+
+}
+
+sub findStartPos {
+  my @word = @{shift()};
+
+  my $ret;
+  my $count = 0;
+
+  foreach (@word) {
+    if (length ($_) != 1) { die ("[$_] should be 1 char long"); }
+    if (m/[A-Z]/i) { return $count; }
+    $count++;
+  }
+
+  return undef;
+
+}
+
+sub findEndPos {
+
+  my @word = @{shift()};
+
+  my $ret;
+  my $count = 0;
+  my $char_at_last_count;
+
+  foreach (@word) {
+    if (length ($_) != 1) { die ("[$_] should be 1 char long"); }
+    if (m/[A-Z]/i) { $char_at_last_count = $count; }
+    $count++;
+  }
+
+  return $char_at_last_count;
+
+}
+
+sub jumbleWord {
+
+  my @word_data;
+
+  my $word_as_string = shift;
+
+
+  my @word_as_array =  split(//, $word_as_string);
+  
+  my $start_word_pos = &findStartPos(\@word_as_array);
+  my $end_word_pos = &findEndPos(\@word_as_array);
+
+  return $word_as_string if ($end_word_pos - $start_word_pos <= 2);  # dont bother with anything less than 4 letter word
+
+#  print "\n___debug:  $start_word_pos -> $end_word_pos\n";
+
+  if (! defined($start_word_pos)) {
+#    print "\n___debug:  $word_as_string not really a word.\n";
+    return $word_as_string;
+  } elsif ($start_word_pos == $end_word_pos) {
+#    print "\n___debug:  $word_as_string has only 1 letter.\n";
+    return $word_as_string;
+  }
+
+  my @jumble_bin;
+
+  for (my $i=0; $i < scalar(@word_as_array); $i++) {
+
+    my $char = $word_as_array[$i];
+
+    my $single_data_char = lc($char);
+    my $single_data_to_uppercase;
+    my $single_data_jumble;
+
+    if ($char =~ m/[A-Z]/) {
+      $single_data_to_uppercase = 1;
+    }
+
+    if ($char =~ m/[A-Z]/i) {
+      $single_data_jumble = 1;
+    }
+
+    if ($i == $start_word_pos || $i == $end_word_pos) {
+      $single_data_jumble = 0;
+    }
+
+    if ($single_data_jumble) {
+      push (@jumble_bin, $single_data_char);
+    }
+
+    push(@word_data, { 'char' => $single_data_char, 'to_uppercase' => $single_data_to_uppercase, 'jumble' => $single_data_jumble } );
+
+  }
+
+
+#  print Dumper (@jumble_bin);
+
+  my $word_builder;
+  my $tests = 0;
+
+  do {
+    $tests++;
+
+    my @jumble_bin_beater = shuffle(@jumble_bin);
+
+    undef $word_builder;
+
+    foreach (@word_data) {
+
+      my $char_to_use;
+
+      my %single_data = %{$_};
+
+      if ($single_data{jumble}) {
+	$char_to_use = pop(@jumble_bin_beater);
+      } else {
+	$char_to_use = $single_data{char};
+      }
+
+      if ($single_data{to_uppercase}) {
+	$char_to_use = uc($char_to_use);
+      }
+
+      $word_builder .= $char_to_use;
+
+    }
+  } until (($word_builder ne $word_as_string) or $tests >= 20);
+
+  return $word_builder;
+
+#  print Dumper %word_data;
+
+} # end of jumbleWord
+

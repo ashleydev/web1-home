@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if [ "$1" ] ; then
+  echo "$1" >> ~/.newsfeed
+else
+  echo Purpose: Quickly add a line of text to the ~./newsfeed file
+  echo
+  echo Usage: $0 '"text"'
+fi

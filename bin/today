@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+
+#use String::Strip;
+#use Data::Dumper;
+
+use strict;
+
+# START ---------------------- 
+
+my $date = `date '+\%b \%_d'`;
+chomp($date);
+system("ls -lA | grep '$date'");
+
+# END ---------------------- 

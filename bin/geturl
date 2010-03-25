@@ -1,0 +1,9 @@
+#!/usr/bin/perl
+
+use strict;
+
+while (<STDIN>) {
+  if (m/http:\/\/\S+/) {
+    print "$&\n";
+  }
+}

@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if [ "$1" ]
+then
+#  ~sjohnson/bin/_fvi "$1" si $2 $3 $4
+  ~sjohnson/bin/_fvi "$1" sb $2 $3 $4
+else
+  echo "Usage: $0 [query]"
+fi

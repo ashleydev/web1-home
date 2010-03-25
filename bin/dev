@@ -1,0 +1,45 @@
+#!/bin/sh
+
+# run this using the . command in bash.  The shebang above is simply for syntax highlighting
+
+TEMP_DEV=`uname -n`
+
+if [ "$TEMP_DEV" = web2 ] ; then
+  DESTINATION_DIR="/home/sjohnson/rsync_persist/dev"
+else
+  DESTINATION_DIR="/home/sjohnson/dev"
+fi
+
+if [ -n "$1" ] ; then
+
+  TEMP_I=1
+  DIR_COUNT=`lsdir $DESTINATION_DIR | wc -l`
+
+  if [ $DIR_COUNT -eq 0 ] ; then
+    cd $DESTINATION_DIR
+  else
+    if [ $DIR_COUNT -eq 1 ] ; then
+      DIR_SINGLE=`lsdir $DESTINATION_DIR`
+      cd $DESTINATION_DIR/$DIR_SINGLE
+    else
+      for TEMP_DIRS in `lsdir -t $DESTINATION_DIR`
+      do
+	if [ $1 -eq $TEMP_I ]
+	then
+	  cd $DESTINATION_DIR/$TEMP_DIRS
+	else
+	  false
+	fi
+	TEMP_I=`expr $TEMP_I + 1`
+      done
+    fi
+  fi
+else
+  devlist
+fi
+
+unset DESTINATION_DIR
+unset TEMP_DEV
+unset TEMP_I
+unset DIR_COUNT
+unset DIR_SINGLE

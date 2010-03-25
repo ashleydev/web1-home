@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+use strict;
+use v5.10.0;
+
+my @args_to_ls;
+my $flag_hyphen_first_arg;
+
+foreach (@ARGV) {
+  when ("--hyphen_first_arg") { $flag_hyphen_first_arg = 1; }
+  when (m/^(0k|l-)$/ && ! grep(/^-l$/, @args_to_ls)) { push @args_to_ls, "-l"; }
+  default { push @args_to_ls, $_; }
+}
+
+
+if ($flag_hyphen_first_arg) {
+  foreach (@args_to_ls) {
+    if (! m/^-/) { $_ = "-$_"; last; }
+  }
+}
+
+system("/bin/ls @args_to_ls");

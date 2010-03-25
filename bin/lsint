@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+use strict;
+
+my $flag_path_interm = 1; # always make it so that you don't have to specify the path
+my $path_interm = '/home/pubstock/interm';
+
+my @param_collection;
+my @files;
+
+foreach (@ARGV) {
+
+  if (m/^(-i|--interm)$/) { $flag_path_interm = 1; }
+  else { push (@param_collection, $_); }
+
+}
+
+foreach (@param_collection) {
+  
+  my $str;
+
+  if ($flag_path_interm) {
+    $str = $path_interm.'/';
+  }
+
+  $str .= $_;
+
+  #if ( -f $str ) {
+    push (@files, $str.'*');
+  #}
+
+}
+
+if (@files) {
+  print "\n";
+  system("ls -lh @files");
+  print "\n";
+  system("file @files");
+  print "\n";
+} else {
+  print "Purpose: ls -l listing of interm files.  Automatically does a wildcard search at the end of the query\n\n";
+  print "Usage: $0 (-i|--interm) [file(s) ...]\n";
+}
