@@ -1,0 +1,10 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =8
+let g:netrw_dirhist_1='/home/sjohnson/bin/archives'
+let g:netrw_dirhist_2='/tmp/bkzip-parse'
+let g:netrw_dirhist_3='/home/pubstock/perl/jspacker'
+let g:netrw_dirhist_4='/home/http/www/tmpimg'
+let g:netrw_dirhist_5='/'
+let g:netrw_dirhist_6='/tmp/sjohnson'
+let g:netrw_dirhist_7='/tmp'
+let g:netrw_dirhist_8='/tmp/driver'
