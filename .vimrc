@@ -95,6 +95,8 @@ map ,. :.,$d<Cr>
 " up and down behaviour improved
 map j gj
 map k gk
+map OA k
+map OB j
 
 " Add a simple PHP logger
 map \z oLogger::log(print_r($<Esc>mta,1), "/tmp/mikey-log");<Esc>`ta
