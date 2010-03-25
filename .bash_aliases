@@ -1,3 +1,140 @@
+unalias -a # remove all aliases
+
+# taken from a default .bashrc from Ubuntu, must be redeclared as the top unalias will destroy it
+  # enable color support of ls and also add handy aliases
+  if [ -x /usr/bin/dircolors ]; then
+      test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+      alias ls='ls --color=auto'
+      #alias dir='dir --color=auto'
+      #alias vdir='vdir --color=auto'
+
+      alias grep='grep --color=auto'
+      alias fgrep='fgrep --color=auto'
+      alias egrep='egrep --color=auto'
+  fi
+
+# prompt color vars
+DULL=0
+BRIGHT=1
+
+FG_BLACK=30
+FG_RED=31
+FG_GREEN=32
+FG_YELLOW=33
+FG_BLUE=34
+FG_VIOLET=35
+FG_CYAN=36
+FG_WHITE=37
+
+FG_NULL=00
+
+BG_BLACK=40
+BG_RED=41
+BG_GREEN=42
+BG_YELLOW=43
+BG_BLUE=44
+BG_VIOLET=45
+BG_CYAN=46
+BG_WHITE=47
+
+BG_NULL=00
+
+##
+# ANSI Escape Commands
+##
+ESC="\033"
+NORMAL="\[$ESC[m\]"
+RESET="\[$ESC[${DULL};${FG_WHITE};${BG_NULL}m\]"
+
+##
+# Shortcuts for Colored Text ( Bright and FG Only )
+##
+
+# DULL TEXT
+
+BLACK="\[$ESC[${DULL};${FG_BLACK}m\]"
+RED="\[$ESC[${DULL};${FG_RED}m\]"
+GREEN="\[$ESC[${DULL};${FG_GREEN}m\]"
+YELLOW="\[$ESC[${DULL};${FG_YELLOW}m\]"
+BLUE="\[$ESC[${DULL};${FG_BLUE}m\]"
+VIOLET="\[$ESC[${DULL};${FG_VIOLET}m\]"
+CYAN="\[$ESC[${DULL};${FG_CYAN}m\]"
+WHITE="\[$ESC[${DULL};${FG_WHITE}m\]"
+
+# BRIGHT TEXT
+BRIGHT_BLACK="\[$ESC[${BRIGHT};${FG_BLACK}m\]"
+BRIGHT_RED="\[$ESC[${BRIGHT};${FG_RED}m\]"
+BRIGHT_GREEN="\[$ESC[${BRIGHT};${FG_GREEN}m\]"
+BRIGHT_YELLOW="\[$ESC[${BRIGHT};${FG_YELLOW}m\]"
+BRIGHT_BLUE="\[$ESC[${BRIGHT};${FG_BLUE}m\]"
+BRIGHT_VIOLET="\[$ESC[${BRIGHT};${FG_VIOLET}m\]"
+BRIGHT_CYAN="\[$ESC[${BRIGHT};${FG_CYAN}m\]"
+BRIGHT_WHITE="\[$ESC[${BRIGHT};${FG_WHITE}m\]"
+
+# REV TEXT as an example
+REV_CYAN="\[$ESC[${DULL};${BG_WHITE};${BG_CYAN}m\]"
+REV_RED="\[$ESC[${DULL};${FG_YELLOW}; ${BG_RED}m\]"
+
+PROMPT_COMMAND='export ERR=$?'
+
+cdc () {
+  if [ -n "$1" ] ; then
+    [ -f "$1" ] && cd `echo $1 | sed -e 's/\/[^\/]*$//'` && return
+    [ -d "$1" ] && cd "$1" && return
+    echo "$0: cd: $1: No such file or directory" && return
+  else
+    cd && return
+  fi
+}
+
+alias cd=cdc
+
+# color prompt changes
+if [ "$HOSTNAME" = "web2" ] ; then
+  PS1="${BRIGHT_RED}\u${BRIGHT_YELLOW}@${BRIGHT_RED}\h${WHITE}:\w${BRIGHT_CYAN}${NORMAL}\$ ${RESET}"
+elif [ "$HOSTNAME" = "mooseman" ] ; then
+  PS1="${BRIGHT_VIOLET}\u${BRIGHT_YELLOW}@${BRIGHT_VIOLET}\h${WHITE}:\w${BRIGHT_CYAN}${NORMAL}\$ ${RESET}"
+fi
+
+if [ "$USER" = "root" ] ; then
+  PS1="${BRIGHT_CYAN}\u${NORMAL}@\h:\w\$ ${RESET}"
+fi
+
+if [ "$SSH_AGENT_PID" ] ; then
+  PS1=[${BRIGHT_GREEN}AGENT${RESET}]\ "$PS1"
+fi
+
+if [ "$HOSTNAME" = "web1" ] || [ "$HOSTNAME" = "web2" ] ; then
+
+  if [ -d /home/pubstock/perl ] ; then
+      PATH=$PATH:/home/pubstock/perl
+  fi
+
+  if [ -d /home/http/javascript ] ; then
+      PATH=$PATH:/home/http/javascript
+  fi
+
+  if [ -d ~/bin-sjlib ] ; then
+      PATH=$PATH:~/bin-sjlib
+  fi
+
+  if [ -s ~/.newsfeed ] ; then
+    echo "^[[1;33mNEWSFEED:^[[00m"
+    cat ~/.newsfeed
+    echo
+  fi
+
+fi
+
+# EXPORTS
+export EDITOR=vi
+
+# even after the nov 2009 ubuntu upgrade, you still need to run BOTH of these commands in this order to enable the behaviour you want
+export TERM=linux
+export TERM=xterm
+
+#### ACTUAL ALIASES START HERE ####
+#
 # grep helper
 alias gerp='grep'
 alias greo='grep'
