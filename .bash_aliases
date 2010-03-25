@@ -156,7 +156,7 @@ alias w='w -s | ~/bin/hl sjohnson | ~/bin/hl falzer --color=blue --bold | ~/bin/
 alias which='. /home/sjohnson/bin/which_helper_partA.sh'
 alias du='du -h'
 alias df='df -h'
-alias cg="sudo perl ~sjohnson/bin/crongrep"
+alias cg="sudo perl ~sjohnson/bin-sjlib/crongrep"
 
 # vi harmony
 alias vi='vim'
@@ -391,7 +391,7 @@ if [ $HOSTNAME = web1 ] ; then
   # these are so that I don't put something in for these text files on web2 and have it wiped the next day
   alias log='~/bin/log'
   alias 3="vi ~/.3rdparty"
-  alias vihlp='vi ~sjohnson/bin/hlp'
+  alias vihlp='vi ~sjohnson/bin-sjlib/hlp'
   alias ord='vi ~/doc/order.txt'
   alias inv="vi ~/doc/invoice.txt"
   alias r1='[ -d ~/rtk ] && cd ~/rtk ; vi ~/rtk/rtk.txt'
@@ -424,7 +424,7 @@ alias mnvjs='mvjs'
 alias mvjsp='mvjs --pack'
 alias lspl='ls -l `cat /tmp/sjohnson/projectlist`'
 alias plgrpadm='grpadm `cat /tmp/sjohnson/projectlist`'
-alias copyback='perl ~/bin/copyback.pl'
+alias copyback='perl /home/sjohnson/bin-sjlib/copyback.pl'
 alias flmd5='md5sum `cat filelist`'
 alias pl='cat /tmp/sjohnson/filelist'
 alias vipl='vi /tmp/sjohnson/projectlist'
@@ -432,7 +432,7 @@ alias backup=". ./backup.sh" # sjohnson (12nov2008): made so that it uses the . 
 alias plcat='cat /tmp/sjohnson/projectlist'
 alias catpl="plcat"
 alias vifl='vi ./filelist'
-alias cpb='sudo /home/sjohnson/bin/flgrpadm && copyback ! && mvjs' # the last one is an alias call
+alias cpb='sudo /home/sjohnson/bin-sjlib/flgrpadm && copyback ! && mvjs' # the last one is an alias call
 
 # mountain of quick backup edits
 alias 1='f 1' ; alias 2='f 2' ; alias 3='f 3' ; alias 4='f 4'
@@ -453,7 +453,7 @@ alias 49='f 49' ; alias 50='f 50'
 if [ $HOSTNAME = web2 ] ; then
   alias flw1diff='listinterface --batch-processing w1diff'
   alias flw1diffnv='listinterface --batch-processing "w1diff -nv"'
-  alias web1="ssh `/home/sjohnson/bin/getcfgbykey ip_web1`"
+  alias web1="ssh `/home/sjohnson/bin-sjlib/getcfgbykey ip_web1`"
 fi
 
 # KANJI
