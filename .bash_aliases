@@ -342,7 +342,7 @@ alias testclient='ftp client.bookmanager.com'
 alias moldy='support_expiry_report.pl mail@bookmanager.com xmlisbn_countdown services'
 
 # ssh agent mode
-alias agent="ssh-agent sh -c 'ssh-add && ssh-add /home/sjohnson/.ssh/repo.or.cz && bash'"
+alias agent="ssh-agent sh -c 'ssh-add && ssh-add /home/sjohnson/.ssh/github && bash'"
 alias isagent='if [ "$SSH_AGENT_PID" ] ; then  echo Agent is set ; else  echo No ; fi'
 alias isa='isagent'
 
