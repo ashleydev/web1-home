@@ -1,39 +1,26 @@
-unalias -a # remove all aliases
-#
-# taken from a default .bashrc from Ubuntu, must be redeclared as the top unalias will destroy it
-  # enable color support of ls and also add handy aliases
-  if [ -x /usr/bin/dircolors ]; then
-      test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-      alias ls='ls --color=auto'
-      #alias dir='dir --color=auto'
-      #alias vdir='vdir --color=auto'
-
-      alias grep='grep --color=auto'
-      alias fgrep='fgrep --color=auto'
-      alias egrep='egrep --color=auto'
-  fi
-
 # path setup
 if [ "$HOSTNAME" = "web1" ] || [ "$HOSTNAME" = "web2" ] ; then
 
-  if [ -d /home/pubstock/perl ] ; then
-      PATH=$PATH:/home/pubstock/perl
+  if [ ! "$EXTRA_PATHS_SET" ] ; then
+    
+    export EXTRA_PATHS_SET=1
+
+    if [ -d /home/pubstock/perl ] ; then
+	PATH=/home/pubstock/perl:$PATH
+    fi
+
+    if [ -d ~/bin-sjlib ] ; then
+	PATH=$PATH:~/bin-sjlib
+    fi
+
+    if [ -s ~/.newsfeed ] ; then
+      echo "^[[1;33mNEWSFEED:^[[00m"
+      cat ~/.newsfeed
+      echo
+    fi
+
   fi
 
-  if [ -d ~/bin-sjlib ] ; then
-      PATH=$PATH:~/bin-sjlib
-  fi
-
-  if [ -s ~/.newsfeed ] ; then
-    echo "^[[1;33mNEWSFEED:^[[00m"
-    cat ~/.newsfeed
-    echo
-  fi
-
-fi
-
-if [ -d ~/bin ] ; then
-    PATH=$PATH:~/bin
 fi
 
 # prompt color vars
@@ -225,7 +212,7 @@ alias wc-l='wc -l'
 alias cfv='cfvi'
 
 # .bashrc helper
-alias reb='. ~/.bashrc'
+alias reb='unalias -a && . ~/.bashrc'
 alias .b='vi ~/.bashrc'
 alias ,b='.b'
 alias .ba='vi ~/.bash_aliases'
