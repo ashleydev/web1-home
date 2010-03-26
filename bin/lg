@@ -1,10 +1,5 @@
 #!/usr/bin/perl
 
-use Sort::Key qw(nkeysort);
-use Data::Types;
-
-#KNOWN ISSUE: relies on nkeysort from CPAN... could perhaps find a workaround
-
 use strict;
 
 # How to use (examples):
@@ -50,7 +45,7 @@ my @line_coordinates;
 
 foreach (@ARGV) {
   if ( -f $_ && !$int_file ) { $int_file = $_; }
-  elsif (Data::Types::is_int ($_)) { push (@line_coordinates, $_); }
+  elsif (m/^[0-9]+$/) { push (@line_coordinates, $_); }
   elsif ($_ eq '-c') { $flag_color = !$flag_color; }
   elsif ($_ eq '-l') { $flag_lineprefix = !$flag_lineprefix; }
   elsif ($_ eq 'e') { $flag_line_end = 1; }
@@ -58,11 +53,11 @@ foreach (@ARGV) {
   elsif (m/^-C(\d*)$/) { $flag_c = $1; }
 }
 
-my @line_coordinates_sorted = nkeysort { $_ } @line_coordinates;
+my @line_coordinates = sort { $a <=> $b } @line_coordinates;
 
 # it's only going to take the first two... so if someone puts 20 30 40, it's only going to grab lines 20-30
-$line_start = shift(@line_coordinates_sorted);
-$line_end = shift(@line_coordinates_sorted);
+$line_start = shift(@line_coordinates);
+$line_end = shift(@line_coordinates);
 
 
 # checks to see if the user specified only one line number instead of a range
@@ -81,7 +76,7 @@ if ($line_start) {
     print "end: $line_end\n"; 
     print "file: $int_file\n"; 
     use Data::Dumper;
-    print Dumper (@line_coordinates_sorted);
+    print Dumper (@line_coordinates);
   }
 
   # grep like arugment... -C# grabs that many lines above AND below
