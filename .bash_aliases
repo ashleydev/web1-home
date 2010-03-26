@@ -1,5 +1,5 @@
 unalias -a # remove all aliases
-
+#
 # taken from a default .bashrc from Ubuntu, must be redeclared as the top unalias will destroy it
   # enable color support of ls and also add handy aliases
   if [ -x /usr/bin/dircolors ]; then
@@ -12,6 +12,29 @@ unalias -a # remove all aliases
       alias fgrep='fgrep --color=auto'
       alias egrep='egrep --color=auto'
   fi
+
+# path setup
+if [ "$HOSTNAME" = "web1" ] || [ "$HOSTNAME" = "web2" ] ; then
+
+  if [ -d /home/pubstock/perl ] ; then
+      PATH=$PATH:/home/pubstock/perl
+  fi
+
+  if [ -d ~/bin-sjlib ] ; then
+      PATH=$PATH:~/bin-sjlib
+  fi
+
+  if [ -s ~/.newsfeed ] ; then
+    echo "^[[1;33mNEWSFEED:^[[00m"
+    cat ~/.newsfeed
+    echo
+  fi
+
+fi
+
+if [ -d ~/bin ] ; then
+    PATH=$PATH:~/bin
+fi
 
 # prompt color vars
 DULL=0
@@ -102,24 +125,6 @@ fi
 
 if [ "$SSH_AGENT_PID" ] ; then
   PS1=[${BRIGHT_GREEN}AGENT${RESET}]\ "$PS1"
-fi
-
-if [ "$HOSTNAME" = "web1" ] || [ "$HOSTNAME" = "web2" ] ; then
-
-  if [ -d /home/pubstock/perl ] ; then
-      PATH=$PATH:/home/pubstock/perl
-  fi
-
-  if [ -d ~/bin-sjlib ] ; then
-      PATH=$PATH:~/bin-sjlib
-  fi
-
-  if [ -s ~/.newsfeed ] ; then
-    echo "^[[1;33mNEWSFEED:^[[00m"
-    cat ~/.newsfeed
-    echo
-  fi
-
 fi
 
 # EXPORTS
