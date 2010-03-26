@@ -1,3 +1,0 @@
-This repo keeps my aliases and rc files, as well as Vim plugins and perl scripts I wrote for doing day to day work on a *nix machine.
-
-PS:  If you actually read through the bin/ folder, be advised that 90% of these scripts were written when I was learning Perl.  I am aware that some of them are horribly inefficient.
