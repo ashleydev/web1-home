@@ -1,3 +1,7 @@
+# NOTE:  this file is more than just "bash aliases"... it is also some common commands
+# that i didn't want to include into .bashrc as .bashrc changes upon Ubuntu upgrades,
+# and on other *nix systems.
+
 # path setup
 if [ "$HOSTNAME" = "web1" ] || [ "$HOSTNAME" = "web2" ] ; then
 
