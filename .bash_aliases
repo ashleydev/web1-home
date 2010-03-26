@@ -110,10 +110,6 @@ if [ "$HOSTNAME" = "web1" ] || [ "$HOSTNAME" = "web2" ] ; then
       PATH=$PATH:/home/pubstock/perl
   fi
 
-  if [ -d /home/http/javascript ] ; then
-      PATH=$PATH:/home/http/javascript
-  fi
-
   if [ -d ~/bin-sjlib ] ; then
       PATH=$PATH:~/bin-sjlib
   fi
