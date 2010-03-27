@@ -353,11 +353,11 @@ alias dd='~/bin/dd'
 alias ee='~/bin/ee'
 
 # _fvi helper
-alias Ss='~/bin/repo_sfvi ~'
-alias Hs='~/bin/repo_sfvi /home/http'
+alias Ss='~/bin-sjlib/repo_sfvi ~'
+alias Hs='~/bin-sjlib/repo_sfvi /home/http'
 alias hs='Hs'
-alias Ps='~/bin/repo_sfvi /home/pubstock/perl'
-alias Ds='~/bin/repo_sfvi /home/sjohnson/http'
+alias Ps='~/bin-sjlib/repo_sfvi /home/pubstock/perl'
+alias Ds='~/bin-sjlib/repo_sfvi /home/sjohnson/http'
 alias ds=Ds
 
 ### web1 ###
