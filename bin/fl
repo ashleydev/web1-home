@@ -1,5 +1,0 @@
-#!/bin/sh
-
-if [ -f "./filelist" ] ; then
-  cat ./filelist
-fi

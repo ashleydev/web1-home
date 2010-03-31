@@ -1,5 +1,0 @@
-if [ "$DEVMODE" = 1 ] ; then
-  cd `live2dev.pl $1`
-else
-  cd $1
-fi
