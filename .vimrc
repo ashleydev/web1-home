@@ -1,6 +1,7 @@
 hi StatusLine   term=bold cterm=bold ctermfg=Yellow ctermbg=Blue          gui=bold guifg=#FFFFFF guibg=#0050EE
 
 filetype plugin on " needed for NERDcommenter
+filetype indent on
 "------------------------------------------------------------
 
 syntax enable
@@ -40,6 +41,7 @@ map :w:q :wq
 map :w:w :w
 map :w\ :w
 map :qw :wq
+map :Q :q
 " vim grep annoyance prevention
 map :G :g 
 
@@ -129,10 +131,19 @@ map \i mtj^hv<Home>ykP`t
 " quick exit / save commands
 map  :w!<CR>:q!<CR>
 imap  <Esc>:w!<CR>:q!<CR>
-map <C-x> :qa!<CR>
 imap <C-x> <Esc>:qa!<CR>
+
+" get me outta here shortcuts
 map q :qa<CR>
+map <C-x> :qa!<CR>
 
 " perl macros
 map \c mtosub trim { my $str = shift; $str =~ s/^\s*//; $str =~ s/\s*$//; return $str; }<Esc>`tjj
 map \v mtouse v5.10.0;<Esc>`tjj
+
+" NERDcommenter additions and via my classic macros
+map z ,cc
+map Z ,cu
+map \d ,cA sjohnson (<Esc>:r! date +\%d\%b\%Y \| tr 'A-Z' 'a-z' <CR>kJhxA):<Space>
+" fixme - get ,cI to work
+map \D O<Esc>,cA sjohnson (<Esc>:r! date +\%d\%b\%Y \| tr 'A-Z' 'a-z' <CR>kJhxA):<Space>
