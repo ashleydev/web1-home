@@ -476,6 +476,7 @@ alias mk="./mk"
 #alias gsP="(P ; git status | grep modified | awky 3 | abs | sort | uniq ; cd-)"
 #alias gsm="(gsh ; gsP)"
 #alias gs="\
+alias gb='git branch'
 alias gs='git status'
 alias gd='git diff'
 alias gwc='git whatchanged'
