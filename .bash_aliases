@@ -13,8 +13,8 @@ if [ "$HOSTNAME" = "web1" ] || [ "$HOSTNAME" = "web2" ] ; then
 	PATH=/home/pubstock/perl:$PATH
     fi
 
-    if [ -d ~/bin-sjlib ] ; then
-	PATH=$PATH:~/bin-sjlib
+    if [ -d ~/bin-tbm ] ; then
+	PATH=$PATH:~/bin-tbm
     fi
 
     if [ -s ~/.newsfeed ] ; then
@@ -148,7 +148,7 @@ alias w='w -s | ~/bin/hl sjohnson | ~/bin/hl falzer --color=blue --bold | ~/bin/
 alias which='. /home/sjohnson/bin/which_helper_partA.sh'
 alias du='du -h'
 alias df='df -h'
-alias cg="sudo perl ~sjohnson/bin-sjlib/crongrep"
+alias cg="sudo perl ~sjohnson/bin-tbm/crongrep"
 
 # vi harmony
 alias vi='vim'
@@ -269,16 +269,16 @@ alias sfi='/home/http/site_find.pl --case-insensitive'
 alias ff='/home/http/ffind.sh' # not sure what this does
 
 # Change directories (http tree) - now with dev tree env var changing!
-alias img=". /home/sjohnson/bin/cddev /home/http/www/i"
-alias ~h=". /home/sjohnson/bin/cddev /home/http"
-alias sa=". /home/sjohnson/bin/cddev /home/http/code/site/SiteAction/"
-alias web=". /home/sjohnson/bin/cddev /home/http/www"
-alias adm=". /home/sjohnson/bin/cddev /home/http/www/admin"
-alias jsp='. /home/sjohnson/bin/cddev /home/http/www/js'
-alias js='. /home/sjohnson/bin/cddev /home/http/javascript'
-alias tmpimg='. /home/sjohnson/bin/cddev /home/http/www/tmpimg'
-alias dbo='. /home/sjohnson/bin/cddev /home/http/code/site/DBO'
-alias list='. /home/sjohnson/bin/cddev /home/http/code/site/ListFactory'
+alias img=". /home/sjohnson/bin-tbm/cddev /home/http/www/i"
+alias ~h=". /home/sjohnson/bin-tbm/cddev /home/http"
+alias sa=". /home/sjohnson/bin-tbm/cddev /home/http/code/site/SiteAction/"
+alias web=". /home/sjohnson/bin-tbm/cddev /home/http/www"
+alias adm=". /home/sjohnson/bin-tbm/cddev /home/http/www/admin"
+alias jsp='. /home/sjohnson/bin-tbm/cddev /home/http/www/js'
+alias js='. /home/sjohnson/bin-tbm/cddev /home/http/javascript'
+alias tmpimg='. /home/sjohnson/bin-tbm/cddev /home/http/www/tmpimg'
+alias dbo='. /home/sjohnson/bin-tbm/cddev /home/http/code/site/DBO'
+alias list='. /home/sjohnson/bin-tbm/cddev /home/http/code/site/ListFactory'
 
 # Change directories
 alias tmpfs='cd /tmp/tmpfs'
@@ -293,12 +293,12 @@ alias pw="cd ~/perl"
 alias slib="cd /usr/local/lib/site_perl/Sjohnson"
 
 # needed to dot execute these
-alias dev=". ~/bin/dev"
-alias h='. ~/bin/h'
+alias dev=". ~/bin-tbm/dev"
+alias h='. ~/bin-tbm/h'
 
 # Remote access
-alias db="ssh `/home/sjohnson/bin-sjlib/getcfgbykey db_host`" # main database
-alias db2="ssh `/home/sjohnson/bin-sjlib/getcfgbykey db_host_backup`" # backup database
+alias db="ssh `/home/sjohnson/bin-tbm/getcfgbykey db_host`" # main database
+alias db2="ssh `/home/sjohnson/bin-tbm/getcfgbykey db_host_backup`" # backup database
 
 #alias loga="sudo -u root tail /var/log/apache2/error.log"
 
@@ -346,24 +346,18 @@ alias agent="ssh-agent sh -c 'ssh-add && ssh-add /home/sjohnson/.ssh/github && b
 alias isagent='if [ "$SSH_AGENT_PID" ] ; then  echo Agent is set ; else  echo No ; fi'
 alias isa='isagent'
 
-# site AES encryption helper
-#alias dd='sudo -u www-data ~/bin/dd'
-#alias ee='sudo -u www-data ~/bin/ee'
-alias dd='~/bin/dd'
-alias ee='~/bin/ee'
-
 # _fvi helper
-alias Ss='~/bin-sjlib/repo_sfvi ~'
-alias Hs='~/bin-sjlib/repo_sfvi /home/http'
+alias Ss='~/bin-tbm/repo_sfvi ~'
+alias Hs='~/bin-tbm/repo_sfvi /home/http'
 alias hs='Hs'
-alias Ps='~/bin-sjlib/repo_sfvi /home/pubstock/perl'
-alias Ds='~/bin-sjlib/repo_sfvi /home/sjohnson/http'
+alias Ps='~/bin-tbm/repo_sfvi /home/pubstock/perl'
+alias Ds='~/bin-tbm/repo_sfvi /home/sjohnson/http'
 alias ds=Ds
 
 ### web1 ###
 if [ $HOSTNAME = web1 ] ; then
   alias w1mir='isweb1 && mir'
-  alias web2="ssh `/home/sjohnson/bin-sjlib/getcfgbykey ip_web2`"
+  alias web2="ssh `/home/sjohnson/bin-tbm/getcfgbykey ip_web2`"
   alias dev2="web2"
 
   # sjohnson (11jan2010): used for a new system which keeps an env var if i want all my aliases to work as dev mode files
@@ -381,9 +375,8 @@ if [ $HOSTNAME = web1 ] ; then
     alias dev?='if [ "$DEVMODE" = 1 ] ; then echo on ; else echo off ; fi'
 
   # these are so that I don't put something in for these text files on web2 and have it wiped the next day
-  alias log='~/bin/log'
   alias 3="vi ~/.3rdparty"
-  alias vihlp='vi ~sjohnson/bin-sjlib/hlp'
+  alias vihlp='vi ~sjohnson/bin-tbm/hlp'
   alias ord='vi ~/doc/order.txt'
   alias inv="vi ~/doc/invoice.txt"
   alias r1='[ -d ~/rtk ] && cd ~/rtk ; vi ~/rtk/rtk.txt'
@@ -416,7 +409,7 @@ alias mnvjs='mvjs'
 alias mvjsp='mvjs --pack'
 alias lspl='ls -l `cat /tmp/sjohnson/projectlist`'
 alias plgrpadm='grpadm `cat /tmp/sjohnson/projectlist`'
-alias copyback='perl /home/sjohnson/bin-sjlib/copyback.pl'
+alias copyback='perl /home/sjohnson/bin-tbm/copyback.pl'
 alias flmd5='md5sum `cat filelist`'
 alias pl='cat /tmp/sjohnson/filelist'
 alias vipl='vi /tmp/sjohnson/projectlist'
@@ -424,7 +417,7 @@ alias backup=". ./backup.sh" # sjohnson (12nov2008): made so that it uses the . 
 alias plcat='cat /tmp/sjohnson/projectlist'
 alias catpl="plcat"
 alias vifl='vi ./filelist'
-alias cpb='sudo /home/sjohnson/bin-sjlib/flgrpadm && copyback ! && mvjs' # the last one is an alias call
+alias cpb='sudo /home/sjohnson/bin-tbm/flgrpadm && copyback ! && mvjs' # the last one is an alias call
 
 # mountain of quick backup edits
 alias 1='f 1' ; alias 2='f 2' ; alias 3='f 3' ; alias 4='f 4'
@@ -445,7 +438,7 @@ alias 49='f 49' ; alias 50='f 50'
 if [ $HOSTNAME = web2 ] ; then
   alias flw1diff='listinterface --batch-processing w1diff'
   alias flw1diffnv='listinterface --batch-processing "w1diff -nv"'
-  alias web1="ssh `/home/sjohnson/bin-sjlib/getcfgbykey ip_web1`"
+  alias web1="ssh `/home/sjohnson/bin-tbm/getcfgbykey ip_web1`"
 fi
 
 # KANJI
