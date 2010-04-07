@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+
+use strict;
+use v5.10.0;
+
+use File::Basename;
+use Text::Trim;
+use Term::ANSIColor qw(:constants);
+
+# ===
+
+unless (@ARGV) {
+  say "Purpose: to quickly trim the trailing whitespace from lines for easy git committing";
+  print "\n";
+  say "Usage: ".basename($0)." [file1] (file2 ...)";
+  exit(1);
+}
+
+my @files = @ARGV;
+
+foreach my $file (@files) {
+
+  my $flag_newline_found;
+
+  unless (-f $file) {
+    say BOLD, RED, "$file - cannot find", RESET;
+    next;
+  }
+
+  unless (-r $file && -w $file) {
+    say BOLD, BLUE, "$file - need write permission", RESET;
+    next;
+  }
+
+  # read file
+  open(READ, $file);
+  my @lines = <READ>;
+  close(READ);
+
+  # scan for newlines
+  foreach (@lines) {
+    chomp;
+
+    if (m/\s+$/) {
+      $flag_newline_found = 1;
+      rtrim;
+    }
+  }
+
+  # skip if no newlines
+  unless ($flag_newline_found) {
+    say "$file - cannot find trailing space";
+    next;
+  }
+
+  # re-add newlines
+  map { $_ = "$_\n" } @lines;
+
+  # commence writing back to original file
+  open(WRITE, ">$file");
+  print WRITE @lines;
+  if (close(WRITE)) {
+    say BOLD, GREEN, "$file - saved", RESET;
+  } else {
+    say BOLD, RED, "$file - cannot close file! please check this file to see if it is now corrupt", RESET;
+  }
+
+}
