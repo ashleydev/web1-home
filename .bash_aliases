@@ -473,6 +473,7 @@ alias gb='git branch'
 alias gs='git status'
 alias gd='git diff'
 alias gwc='git whatchanged'
+alias gl='git log'
 #(~h ; git status | hl modified | hl deleted r | hl new.file g ; cd-) | less ;\
 #(P ; git status | hl modified | hl deleted r | hl new.file g ; cd-) | less" # brackets for piping
 alias W='sudo -u www-data -s'
