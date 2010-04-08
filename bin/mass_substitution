@@ -73,6 +73,8 @@ foreach my $file (@files) {
     print WRITE $buffer_out;
     if (close(WRITE)) {
       say BOLD, GREEN, "$file - saved", RESET;
+    } else {
+      say RED, "$file - could not close filehandle!", RESET;
     }
   } else {
     say "$file - cannot find string match";
