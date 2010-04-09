@@ -480,7 +480,7 @@ alias gc='git commit'
 alias gch='git checkout'
 alias gpom='git push origin master'
 alias gpsm='~h && git pull sjohnson master'
-alias gpwm='git pull www-data master'
+alias gpwm='devl && git pull www-data master'
 alias devl='dev1 ; ~h'
 
 # test shit
