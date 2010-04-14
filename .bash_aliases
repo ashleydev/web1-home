@@ -304,7 +304,7 @@ alias db2="ssh `/home/sjohnson/bin-tbm/getcfgbykey db_host_backup`" # backup dat
 
 # "farm" programming
 alias vif="vi /tmp/tmpfs/farm.pl"
-alias fa="perl /tmp/tmpfs/farm.pl"
+alias fa="perl -I/home/pubstock/perl/lib /tmp/tmpfs/farm.pl"
 alias vip='vi /tmp/tmpfs/tester.php'
 alias pt='php /tmp/tmpfs/tester.php'
 
