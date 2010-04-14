@@ -1,5 +1,7 @@
 [color]
 	diff = auto
+	branch = auto
+	status = auto
 [user]
 	name = smu johnson
 	email = smujohnson@gmail.com
