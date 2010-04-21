@@ -160,7 +160,7 @@ alias l='ls -lth'
 
 # grep harmony
 alias gr='grep -risn'
-alias g='grep -i'
+alias g='grep -in'
 
 # mv harmony
 alias mvsafe='mv --interactive'
