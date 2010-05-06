@@ -316,6 +316,7 @@ alias .v='vi ~/.vimrc'
 alias .i='vi ~/.inputrc'
 alias .p='vi ~/.profile'
 alias bin='cd ~/bin'
+alias bintbm='cd ~/bin-tbm'
 alias rmnews="[ -e ~/.newsfeed ] && rm ~/.newsfeed"
 alias doc="cd ~/doc"
 alias owe="vi /home/sjohnson/ot/owe.txt"
@@ -470,13 +471,19 @@ alias mk="./mk"
 #alias gs="\
 alias gb='git branch'
 alias gs='git status'
-alias gd='git diff'
+alias flgd="listinterface_git --batch-processing 'git diff'"
+alias gd="git diff"
+alias gchk="listinterface_git --batch-processing 'git checkout'"
+alias flgchk="listinterface_git --batch-processing 'git checkout'"
+alias gcheck='gchk'
+alias flgcheck='flgchk'
 alias gwc='git whatchanged'
 alias gl='git log'
 #(~h ; git status | hl modified | hl deleted r | hl new.file g ; cd-) | less ;\
 #(P ; git status | hl modified | hl deleted r | hl new.file g ; cd-) | less" # brackets for piping
 alias W='sudo -u www-data -s'
 alias gc='git commit'
+alias flgc="listinterface_git --batch-processing 'git commit'"
 alias gch='git checkout'
 alias gpom='git push origin master'
 alias gpsm='~h && git pull sjohnson master'
@@ -485,3 +492,6 @@ alias devl='dev1 ; ~h'
 
 # test shit
 alias mytest='cd /home/sjohnson/http/www/test'
+
+# house
+alias house='vi /home/falzer/house.php'
