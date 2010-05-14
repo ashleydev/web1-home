@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+
+use strict;
+use v5.10.0;
+
+use Term::ANSIColor qw(:constants);
+
+my @lines;
+
+while (<STDIN>) {
+  push (@lines, $_);
+}
+
+{
+  say YELLOW, "---", RESET;
+  local $" = "\n";
+  print "@lines";
+  say YELLOW, "---", RESET;
+}

@@ -1,0 +1,100 @@
+#!/usr/bin/perl
+
+use v5.10.0;
+use strict;
+
+use File::Basename;
+
+use constant MODE_GZIP => 1;
+use constant MODE_BZIP2 => 2;
+
+my $DEBUG = 0;
+
+my $TAR_LOCATION = '/bin/tar';
+
+unless (-x $TAR_LOCATION) {
+  say STDERR "tar command ($TAR_LOCATION) not executable or does not exist.";
+  exit(1);
+}
+
+
+unless (scalar(@ARGV) >= 2) {
+  say "usage: ".basename($0).": [command] [archive] file(s)...";
+  exit(0);
+}
+
+#####
+
+# default VERBOSE and FILE on all tar commands
+my $tar_arg1 = 'vf'; # tar ___ (file)
+my @tar_files; # tar [$tar_arg1] _____
+
+my $script_command = shift(@ARGV);
+my $script_archive = shift(@ARGV);
+my @file_list = @ARGV;
+
+my $archive_type;
+
+given ($script_archive) {
+  when (m/\.tar\.gz$/) { $archive_type = MODE_GZIP; }
+  when (m/\.tgz$/) { $archive_type = MODE_GZIP; }
+
+  when (m/\.tar\.bz2$/) { $archive_type = MODE_BZIP2; }
+  default {
+    say STDERR "Could not determine archive type from archive: $script_archive";
+    exit(1);
+  }
+}
+
+$tar_arg1 .= getModeArg($archive_type);
+
+given ($script_command) {
+  when ('a') { # add
+    # TODO make it actually add to the tarball if it already exists
+
+    unless (@file_list) {
+      say STDERR "No files present, nothing to do!";
+      exit(1);
+    }
+
+    $tar_arg1 .= 'c';
+      
+  }
+
+  when ('x') { # extract
+    if (@file_list) { # only extact these files TODO learn proper syntax for this
+      die ('implement me');
+    } else {
+      $tar_arg1 .= 'x';
+    }
+  }
+
+  when ('l') { # list
+    if (@file_list) { # only list these files TODO learn proper syntax for this
+      die ('implement me');
+    } else {
+      $tar_arg1 .= 't';
+    }
+    
+  }
+
+} # end given script command statement
+
+$_ = "'$_'" for @file_list; # add quotes around each filename, in case of spaces, etc. TODO there has to be a core module to do shell escaping.
+
+my $cmdline = "'$TAR_LOCATION' $tar_arg1 '$script_archive' @file_list";
+if ($DEBUG) {
+  say $cmdline;
+} else {
+  system($cmdline);
+  exit($?);
+}
+
+####
+sub getModeArg {
+  my $mode = shift;
+  given ($mode) {
+    when (MODE_GZIP) { return 'z'; }
+    when (MODE_BZIP2) { return 'j'; }
+  }
+}
