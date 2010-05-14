@@ -4,6 +4,7 @@ use v5.10.0;
 use strict;
 
 use File::Basename;
+use Data::Dumper;
 
 use constant MODE_GZIP => 1;
 use constant MODE_BZIP2 => 2;
@@ -20,6 +21,12 @@ unless (-x $TAR_LOCATION) {
 
 unless (scalar(@ARGV) >= 2) {
   say "usage: ".basename($0).": [command] [archive] file(s)...";
+  print "\n";
+  say "Command list:";
+  say "\ta - add to or create archive";
+  say "\tx - extract archive";
+  say "\tt - display archive contents";
+  print "\n";
   exit(0);
 }
 
@@ -62,31 +69,21 @@ given ($script_command) {
   }
 
   when ('x') { # extract
-    if (@file_list) { # only extact these files TODO learn proper syntax for this
-      die ('implement me');
-    } else {
-      $tar_arg1 .= 'x';
-    }
+    $tar_arg1 .= 'x';
   }
 
   when ('l') { # list
-    if (@file_list) { # only list these files TODO learn proper syntax for this
-      die ('implement me');
-    } else {
-      $tar_arg1 .= 't';
-    }
-    
+    $tar_arg1 .= 't';
   }
 
 } # end given script command statement
 
-$_ = "'$_'" for @file_list; # add quotes around each filename, in case of spaces, etc. TODO there has to be a core module to do shell escaping.
+my @cmds = ($TAR_LOCATION, $tar_arg1, $script_archive, @file_list);
 
-my $cmdline = "'$TAR_LOCATION' $tar_arg1 '$script_archive' @file_list";
 if ($DEBUG) {
-  say $cmdline;
+  say Dumper @cmds;
 } else {
-  system($cmdline);
+  system(@cmds);
   exit($?);
 }
 
