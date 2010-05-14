@@ -278,7 +278,7 @@ alias jsp='. /home/sjohnson/bin-tbm/cddev /home/http/www/js'
 alias js='. /home/sjohnson/bin-tbm/cddev /home/http/javascript'
 alias tmpimg='. /home/sjohnson/bin-tbm/cddev /home/http/www/tmpimg'
 alias dbo='. /home/sjohnson/bin-tbm/cddev /home/http/code/site/DBO'
-alias list='. /home/sjohnson/bin-tbm/cddev /home/http/code/site/ListFactory'
+alias lf='. /home/sjohnson/bin-tbm/cddev /home/http/code/site/ListFactory'
 
 # Change directories
 alias tmpfs='cd /tmp/tmpfs'
@@ -317,6 +317,7 @@ alias .i='vi ~/.inputrc'
 alias .p='vi ~/.profile'
 alias bin='cd ~/bin'
 alias bintbm='cd ~/bin-tbm'
+alias bin-tbm='bintbm'
 alias rmnews="[ -e ~/.newsfeed ] && rm ~/.newsfeed"
 alias doc="cd ~/doc"
 alias owe="vi /home/sjohnson/ot/owe.txt"
@@ -410,7 +411,6 @@ alias mvjsp='mvjs --pack'
 alias lspl='ls -l `cat /tmp/sjohnson/projectlist`'
 alias plgrpadm='grpadm `cat /tmp/sjohnson/projectlist`'
 alias copyback='perl /home/sjohnson/bin-tbm/copyback.pl'
-alias flmd5='md5sum `cat filelist`'
 alias pl='cat /tmp/sjohnson/filelist'
 alias vipl='vi /tmp/sjohnson/projectlist'
 alias backup=". ./backup.sh" # sjohnson (12nov2008): made so that it uses the . instead of running the command
@@ -438,6 +438,7 @@ alias 49='f 49' ; alias 50='f 50'
 if [ $HOSTNAME = web2 ] ; then
   alias flw1diff='listinterface --batch-processing w1diff'
   alias flw1diffnv='listinterface --batch-processing "w1diff -nv"'
+  alias flmd5='md5sum `cat filelist`'
   alias web1="ssh `/home/sjohnson/bin-tbm/getcfgbykey ip_web1`"
 fi
 
@@ -469,21 +470,31 @@ alias mk="./mk"
 #alias gsP="(P ; git status | grep modified | awky 3 | abs | sort | uniq ; cd-)"
 #alias gsm="(gsh ; gsP)"
 #alias gs="\
+
+alias flmd5='listinterface_git --batch-processing md5sum'
 alias gb='git branch'
 alias gs='git status'
-alias flgd="listinterface_git --batch-processing 'git diff'"
+
 alias gd="git diff"
+alias flgd="listinterface_git --batch-processing 'git diff'"
+
+alias ga="git add"
+alias flga="listinterface_git --batch-processing 'git add'"
+
 alias gchk="listinterface_git --batch-processing 'git checkout'"
 alias flgchk="listinterface_git --batch-processing 'git checkout'"
 alias gcheck='gchk'
 alias flgcheck='flgchk'
+
 alias gwc='git whatchanged'
 alias gl='git log'
 #(~h ; git status | hl modified | hl deleted r | hl new.file g ; cd-) | less ;\
 #(P ; git status | hl modified | hl deleted r | hl new.file g ; cd-) | less" # brackets for piping
 alias W='sudo -u www-data -s'
+
 alias gc='git commit'
 alias flgc="listinterface_git --batch-processing 'git commit'"
+
 alias gch='git checkout'
 alias gpom='git push origin master'
 alias gpsm='~h && git pull sjohnson master'
