@@ -1,23 +1,36 @@
 #!/usr/bin/perl
 
+# This is a front-end for the tar command, to use basic WinRAR-based commands to do the same things.
+# I have gotten to the point where I had to put my foot down after using tar's ridiculous comman
+# syntax one too many times.
+#
+# TODO: tmp file generation for the $flag_enable_compress_cycle steps, instead of quitting if it finds
+# the obvious tmp file name is already existant
+
 use v5.10.0;
 use strict;
 
 use File::Basename;
 use Data::Dumper;
 
-use constant MODE_GZIP => 1;
-use constant MODE_BZIP2 => 2;
+# debug levels:
+# 0 : no debug
+# 1 : dryrun
+# 2 : print commands, and execute
+use constant DEBUG_LEVEL => 0;
 
-my $DEBUG = 0;
+use constant TAR_LOCATION => '/bin/tar';
 
-my $TAR_LOCATION = '/bin/tar';
+my %archive_types = (
+  MODE_TAR => { compressible => 0, valid_extensions => [ '.tar' ] },
+  MODE_GZIP => { compressible => 1, tar_command => 'z', exe_compress => '/bin/gzip', exe_uncompress => '/bin/gunzip', valid_extensions => [ '.gz', '.tgz' ] },
+  MODE_BZIP2 => { compressible => 1 ,tar_command => 'j', exe_compress => '/bin/bzip2', exe_uncompress => '/bin/bunzip2', valid_extensions => [ '.bz2' ] },
+);
 
-unless (-x $TAR_LOCATION) {
-  say STDERR "tar command ($TAR_LOCATION) not executable or does not exist.";
+unless (-x TAR_LOCATION) {
+  say STDERR "tar command (".TAR_LOCATION.") not executable or does not exist.";
   exit(1);
 }
-
 
 unless (scalar(@ARGV) >= 2) {
   say "usage: ".basename($0).": [command] [archive] file(s)...";
@@ -33,65 +46,174 @@ unless (scalar(@ARGV) >= 2) {
 #####
 
 # default VERBOSE and FILE on all tar commands
-my $tar_arg1 = 'vf'; # tar ___ (file)
-my @tar_files; # tar [$tar_arg1] _____
+my $tar_command = 'vf'; # tar ___ (file)
+my @tar_files; # tar [$tar_command] _____
 
 my $script_command = shift(@ARGV);
 my $script_archive = shift(@ARGV);
 my @file_list = @ARGV;
 
-my $archive_type;
+# flags
+my $flag_enable_compress_cycle; # used when archive must be uncompressed, handled, them re-compressed
 
-given ($script_archive) {
-  when (m/\.tar\.gz$/) { $archive_type = MODE_GZIP; }
-  when (m/\.tgz$/) { $archive_type = MODE_GZIP; }
+my $archive_type = getTypeByFilename($script_archive);
 
-  when (m/\.tar\.bz2$/) { $archive_type = MODE_BZIP2; }
-  default {
-    say STDERR "Could not determine archive type from archive: $script_archive";
-    exit(1);
-  }
+unless (defined($archive_type)) {
+  say STDERR "Could not determine archive type from archive: $script_archive";
+  exit(1);
 }
 
-$tar_arg1 .= getModeArg($archive_type);
+say "archive type: $archive_type" if DEBUG_LEVEL;
 
 given ($script_command) {
-  when ('a') { # add
-    # TODO make it actually add to the tarball if it already exists
+  when ('a') { # add / create
 
     unless (@file_list) {
       say STDERR "No files present, nothing to do!";
       exit(1);
     }
 
-    $tar_arg1 .= 'c';
+    if (-f $script_archive) {
+
+      say "Appending files...";
+      $tar_command .= 'r'; # append mode
+      if ($archive_types{$archive_type}->{compressible}) { $flag_enable_compress_cycle = 1; }
+
+    } else {
+      say "Creating archive...";
+      $tar_command .= 'c'; # create mode
+    }
       
   }
 
-  when ('x') { # extract
-    $tar_arg1 .= 'x';
+  when ('x') {
+    say "Extracting archive...";
+    $tar_command .= 'x';
+  }
+  
+  when ('l') {
+    $tar_command .= 't';
   }
 
-  when ('l') { # list
-    $tar_arg1 .= 't';
+  default {
+    say "Please use a valid command.";
+    exit(1);
   }
 
-} # end given script command statement
-
-my @cmds = ($TAR_LOCATION, $tar_arg1, $script_archive, @file_list);
-
-if ($DEBUG) {
-  say Dumper @cmds;
-} else {
-  system(@cmds);
-  exit($?);
 }
 
-####
-sub getModeArg {
+my @cmds; # array of arrayref, for multiple commands to be run
+
+if ($flag_enable_compress_cycle) {
+  say "Starting uncompression cycle...";
+
+  my $flag_tgz;
+  if (filenameIsTgz($script_archive)) { $flag_tgz = 1; }
+
+  # uncompress archive
+  push(@cmds, [$archive_types{$archive_type}->{exe_uncompress}, $script_archive] );
+
+  # change archive filename, as archive no longer has its archive extension.
+  $script_archive = predictUncompressedTarball($script_archive);
+
+  # check if there is already a file that it will try to uncompress to
+  if (-f $script_archive) {
+    say "Sorry, you already have a file called $script_archive which has complicated matters.  Please deal with it first.";
+    exit(1);
+  }
+
+  push(@cmds, [TAR_LOCATION, $tar_command, $script_archive, @file_list] );
+  push(@cmds, [$archive_types{$archive_type}->{exe_compress}, $script_archive] ); # compression tools will automatically add the appropriate extension, eg: .bz2, .gz
+
+
+  if ($flag_tgz) { # must rename the .tar.gz to .tgz now
+
+    my $predicted_new_filename = predictCompressedTarball($script_archive, $archive_type);
+    my $new_filename = $predicted_new_filename; # tmp copy
+
+    $new_filename =~ s/\.tar\.gz$/.tgz/;
+
+    push(@cmds, ['mv', $predicted_new_filename, $new_filename] );
+  }
+
+} else {
+
+  # add compressed archive switch to tar
+  $tar_command .= $archive_types{$archive_type}->{tar_command};
+
+  push(@cmds, [TAR_LOCATION, $tar_command, $script_archive, @file_list]);
+}
+
+given (DEBUG_LEVEL) {
+  when (0) { processCmds(@cmds); }
+  when (1) { say Dumper \@cmds; }
+  when (2) { say Dumper \@cmds; processCmds(@cmds); }
+  default { die "Invalid debug level: ".DEBUG_LEVEL; }
+}
+
+#====
+
+sub getTypeByFilename {
+  my $filename = shift;
+
+  foreach my $type (keys(%archive_types)) {
+    if (extensionMatchesByType($filename, $type)) { return $type; }
+  }
+
+}
+
+sub extensionMatchesByType {
+  my $filename = shift;
+  my $type = shift;
+
+  foreach my $extension (@{$archive_types{$type}->{valid_extensions}}) {
+    if ($filename =~ m/$extension$/) { return 1; }
+  }
+}
+
+sub predictUncompressedTarball {
+  my $filename = shift;
+
+  my $ret = $filename; # tmp copy
+
+  if (filenameIsTgz($filename)) { $ret =~ s/tgz$/tar/; }
+  elsif ($filename =~ m/\..+$/) { $ret =~ s/\.[^\.]+$//; }
+  else { # break case.  theoretically, should never happen.
+    die "Error occured while trying to predict filename";
+    exit(1);
+  }
+
+  $ret;
+}
+
+sub filenameIsTgz {
+  my $filename = shift;
+  if ($filename =~ m/\.(tgz)$/) { return 1; }
+}
+
+sub predictCompressedTarball {
+  my $filename = shift;
   my $mode = shift;
-  given ($mode) {
-    when (MODE_GZIP) { return 'z'; }
-    when (MODE_BZIP2) { return 'j'; }
+
+  my $ret;
+
+  given ($archive_type) {
+    when ('MODE_GZIP') { $ret = "$filename.gz"; }
+    when ('MODE_BZIP2') { $ret = "$filename.bz2"; }
+
+    default {
+      die "Error occured while trying to predict compressed tarball filename";
+      exit(1);
+    }
+  }
+
+  $ret;
+}
+
+sub processCmds {
+  foreach my $cmd_ref (@_) {
+    say "Command string: @$cmd_ref" if DEBUG_LEVEL;
+    system(@$cmd_ref);
+    exit($?) if $? > 0;
   }
 }
