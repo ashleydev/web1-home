@@ -433,8 +433,8 @@ if [ $HOSTNAME = web1 ] ; then
   alias flgchk="listinterface_git --batch-processing 'git checkout'"
   alias flgc="listinterface_git --batch-processing 'git commit'"
   alias flgcheck='flgchk'
-  alias gpsm='~h && git pull sjohnson master'
-  alias gpwm='devl && git pull www-data master'
+  alias gpsm='~h && git pull sjohnson master && git push origin master'
+  alias gpwm='devl && git pull www-data master && git push origin master'
   alias devl='dev1 ; ~h'
 
   # test shit
