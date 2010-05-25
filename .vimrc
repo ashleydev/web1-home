@@ -28,10 +28,8 @@ set hls
 set nu
 map <C-n> :set nu!<CR>
 
-" auto indent by default
-set ai
-" auto indent toggle
-map <C-i> :set ai!<CR>
+" auto indent toggle (aka tab key)
+map <C-i> :if &indentexpr != ""<CR>:let old_indentexpr=&indentexpr<CR>:setl indentexpr=<CR>:else<CR>:let &l:indentexpr=old_indentexpr<CR>:endif<CR><CR>
 
 " Annoyance prevention
 map w: :w
