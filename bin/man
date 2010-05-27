@@ -1,13 +1,24 @@
 #!/bin/sh
 
-TMP_FILENAME="/tmp/tmpfs/.tmp_man"
+TMP_RAMDRIVE_DIR=/tmp/tmpfs
+TMP_DIR=/tmp
+TMP_FILENAME=.tmp_man
+
+if [ -d TMP_RAMDRIVE_DIR ] ; then
+  TMP_FILE=$TMP_RAMDRIVE_DIR/$TMP_FILENAME
+else
+  TMP_FILE=$TMP_DIR/$TMP_FILENAME
+fi
 
 if [ "$1" ] ; then
-  /usr/bin/man $1 > $TMP_FILENAME && vi -c "set nomod" $TMP_FILENAME && rm $TMP_FILENAME
+  /usr/bin/man "$1" > $TMP_FILE && vi -c "set nomod" $TMP_FILE && rm $TMP_FILE
 else
   echo Purpose: Vim paginated man pages!
   echo
   echo Usage: $0 '[query]'
 fi
 
+unset TMP_RAMDRIVE_DIR
+unset TMP_DIR
 unset TMP_FILENAME
+unset TMP_FILE
