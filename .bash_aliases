@@ -400,7 +400,6 @@ if [ $HOSTNAME = web1 ] ; then
     alias dev?='if [ "$DEVMODE" = 1 ] ; then echo on ; else echo off ; fi'
 
   # these are so that I don't put something in for these text files on web2 and have it wiped the next day
-  alias 3="vi ~/.3rdparty"
   alias vihlp='vi ~sjohnson/bin-tbm/hlp'
   alias ord='vi ~/doc/order.txt'
   alias inv="vi ~/doc/invoice.txt"
