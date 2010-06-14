@@ -3,13 +3,7 @@
 use strict;
 use Cwd qw(realpath);
 
-
-
-
-
 my $flag_help;
-
-use String::Strip;
 
 my @files;
 
@@ -44,11 +38,8 @@ if ($flag_help) {
   }
   
   foreach (@files) {
-    StripLTSpace($_);
 
-    #$_ =~ s/^~/$ENV{HOME}/;
-#    if ( -e $_ ) { # checks files and dirs
-    if ( -f $_ ) { # checks files only
+    if (-f $_) { # checks files only
 
       my $output = realpath($_);
 
