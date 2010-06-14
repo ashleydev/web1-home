@@ -19,4 +19,4 @@ if ($flag_hyphen_first_arg) {
   }
 }
 
-system("/bin/ls @args_to_ls");
+system("/bin/ls", @args_to_ls);
