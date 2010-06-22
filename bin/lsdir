@@ -2,7 +2,6 @@
 
 ### used in the dev list function
 
-use String::Strip;
 use Data::Dumper;
 use Cwd qw(realpath);
 
