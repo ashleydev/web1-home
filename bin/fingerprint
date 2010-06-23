@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+
+use strict;
+use v5.10.0;
+
+use Sys::Hostname;
+
+my $FILE_RSA_PUBLIC_KEY = '/etc/ssh/ssh_host_rsa_key';
+
+unless (-f $FILE_RSA_PUBLIC_KEY) {
+  say "Cannot find public key.";
+  exit(1);
+}
+
+my $keydata = `ssh-keygen -l -f $FILE_RSA_PUBLIC_KEY`;
+chomp($keydata);
+
+# fingerprint example below:
+# 2048 1e:91:12:aa:b7:80:33:ab:f2:0c:67:84:ae:40:d8:54 /etc/ssh/ssh_host_rsa_key.pub (RSA)
+my @fields = split(/\s+/, $keydata);
+
+my $hostname = hostname;
+my $keysize = $fields[0];
+my $fingerprint = $fields[1];
+my $keytype = $fields[3];
+
+# get extract data from key type brackets
+if ($keytype =~ m/^\((\w+)\)$/) { $keytype = $1; }
+
+say "$hostname\t$fingerprint  $keytype/$keysize";
