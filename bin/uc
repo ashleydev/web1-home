@@ -1,5 +1,9 @@
 #!/usr/bin/perl
 
+my $buffer;
+
 while (<>) {
-  print uc($_);
+  $buffer .= $_;
 }
+
+print uc($buffer);

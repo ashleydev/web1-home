@@ -1,5 +1,9 @@
 #!/usr/bin/perl
 
+my $buffer;
+
 while (<>) {
-  print lc($_);
+  $buffer .= $_;
 }
+
+print lc($buffer);
