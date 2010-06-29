@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+
+use strict;
+use v5.10.0;
+
+use Digest::MD5 qw(md5_hex);
+
+use Term::ANSIColor qw(:constants);
+
+foreach (@ARGV) {
+  say md5_hex($_)."\t".BOLD.YELLOW.'['.RESET.$_.BOLD.YELLOW.']'.RESET;
+}
