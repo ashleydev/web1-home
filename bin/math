@@ -1,12 +1,55 @@
 #!/usr/bin/perl
 
 use strict;
+use warnings;
+use v5.10.0;
+
+use IO::Handle;
+use IPC::Open2;
 use Term::ANSIColor qw(:constants);
 
-my $total = 0;
+use constant CHAR_BACKSLASH => '\\';
 
-while (<STDIN>) {
-  if (m/([0-9\.]+)/) { $total += $1; }
+open2(my $bc_out, my $bc_in, 'bc') or die;
+
+sub commify {
+  1 while $_[0] =~ s/^([-+]?\d+)(\d{3})/$1,$2/;
 }
 
-print BOLD, YELLOW, "$total\n", RESET;
+sub replace {
+  $_[0] =~ s/\Q$_[1]\E/$_[2]/g;
+}
+
+sub bc {
+  my $expression = shift;
+  my $ignore_return = shift;
+
+  my $ret;
+  $bc_in->print($expression, "\n" );
+
+  return if ($ignore_return);
+
+  for (;;) {
+    my $bc_line = <$bc_out>;
+    chomp($bc_line);
+    $ret .= $bc_line;
+    last if (substr($bc_line, -1, 1) ne CHAR_BACKSLASH); # cludge to halt retrieving lines from bc and hanging IPC::Open2;
+  }
+
+  replace($ret, CHAR_BACKSLASH, '');
+  return $ret;
+} 
+
+sub destroyCommas {
+  $_[0] =~ s/,//g;
+}
+
+# --- PROGRAM START ---
+bc('scale=4', 1);
+
+while (<STDIN>) {
+  destroyCommas($_);
+  my $answer = bc($_);
+  commify($answer);
+  say YELLOW, $answer, RESET;
+}

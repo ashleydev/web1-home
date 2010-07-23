@@ -267,6 +267,7 @@ if [ "$HOSTNAME" = "web1" ] || [ "$HOSTNAME" = "web2" ] ; then
   # useful commands
   alias doquery='sudo -u www-data php /home/http/code/test/doquery.php'
   #alias esdr='exec screen -d -r'
+  alias scr='screen -r -U'
   alias cf='/home/http/codefind.sh'
 
   # search frontends
@@ -336,7 +337,7 @@ if [ "$HOSTNAME" = "web1" ] || [ "$HOSTNAME" = "web2" ] ; then
   alias agent="ssh-agent sh -c 'ssh-add && ssh-add /home/sjohnson/.ssh/github && bash'"
 
   alias massdevcp='/home/http/copy_tree_dev.sh ~sjohnson/http'
-  alias f='11pm-warn.pl && listinterface_git --individual-processing vi'
+  alias f='listinterface_git --individual-processing vi'
   alias flmir='listinterface --batch-processing mir'
   alias flbkdiff='listinterface --batch-processing bkdiff'
   alias flsyn='listinterface --batch-processing syntaxtest'
@@ -426,15 +427,18 @@ if [ $HOSTNAME = web1 ] ; then
 
   # file list git
   alias W='sudo -u www-data -s'
+  alias lig='vi ~/bin-tbm/listinterface_git'
   alias flmd5='listinterface_git --batch-processing md5sum'
   alias flgd="listinterface_git --batch-processing 'git diff'"
   alias flga="listinterface_git --batch-processing 'git add'"
   alias flgchk="listinterface_git --batch-processing 'git checkout'"
   alias flgc="listinterface_git --batch-processing 'git commit'"
+  alias flrm="listinterface_git --batch-processing rm"
   alias flgcheck='flgchk'
   alias gpsm='~h && git pull sjohnson master && git push origin master && exit'
   alias gpwm='devl && git pull www-data master'
   alias devl='dev1 ; ~h'
+  alias delv='devl'
 
   # test shit
   alias mytest='cd /home/sjohnson/http/www/test'
