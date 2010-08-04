@@ -1,3 +1,5 @@
+# web1 & web2 aliases
+
 if [ ! "$EXTRA_PATHS_SET" ] ; then
   
   export EXTRA_PATHS_SET=1

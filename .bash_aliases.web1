@@ -1,4 +1,5 @@
-### WEB1 ONLY ###
+# web1 only aliases
+
 alias w1mir='isweb1 && mir'
 alias web2="ssh `/home/sjohnson/bin-tbm/getcfgbykey ip_web2`"
 alias dev2="web2"

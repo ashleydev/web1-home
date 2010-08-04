@@ -1,4 +1,5 @@
-# prompt color vars
+# prompt colour aliases for easy access, and some if statements near the bottom
+
 DULL=0
 BRIGHT=1
 
@@ -65,7 +66,7 @@ PROMPT_COMMAND='export ERR=$?'
 # color prompt changes
 if [ "$HOSTNAME" = "web2" ] ; then
   PS1="${BRIGHT_RED}\u${BRIGHT_YELLOW}@${BRIGHT_RED}\h${WHITE}:\w${BRIGHT_CYAN}${NORMAL}\$ ${RESET}"
-elif [ "$HOSTNAME" = "toneloc" ] ; then
+elif [ "$HOSTNAME" = "ToneLoc" ] ; then
   PS1="${BRIGHT_VIOLET}\u${BRIGHT_YELLOW}@${BRIGHT_VIOLET}\h${WHITE}:\w${BRIGHT_CYAN}${NORMAL}\$ ${RESET}"
 fi
 

@@ -1,4 +1,4 @@
-unalias -a
+# common aliases
 
 [ -f ~/.bash_aliases.colourprompt ] && . ~/.bash_aliases.colourprompt
 

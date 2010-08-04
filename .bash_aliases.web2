@@ -1,3 +1,5 @@
+# web1 only aliases
+
 alias flw1diff='listinterface --batch-processing w1diff'
 alias flw1diffnv='listinterface --batch-processing "w1diff -nv"'
 alias flmd5='md5sum `cat filelist`'
