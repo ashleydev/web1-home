@@ -70,7 +70,7 @@ alias l='ls -lth'
 
 # grep harmony
 alias gr='grep -risn'
-alias g='grep -in'
+alias g='grep -sin'
 
 # mv harmony
 alias mvsafe='mv --interactive'
