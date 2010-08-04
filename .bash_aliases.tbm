@@ -50,7 +50,6 @@ alias flog='tail -f /home/http/code/flex/log/activity.log'
 # useful commands
 alias doquery='sudo -u www-data php /home/http/code/test/doquery.php'
 #alias esdr='exec screen -d -r'
-alias scr='screen -r -U'
 alias cf='/home/http/codefind.sh'
 
 # search frontends

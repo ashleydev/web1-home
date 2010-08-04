@@ -46,6 +46,10 @@ alias dirb='find $PWD'
 alias del='rm'
 alias erase='rm'
 
+# GNU screen
+alias sca='screen -a'
+alias scr='screen -r -U'
+
 # better default actions
 alias su='sudo -s'
 alias less='less -i -R'
