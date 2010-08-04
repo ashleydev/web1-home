@@ -17,7 +17,7 @@ if [ -n "$1" ] ; then
 
     if [ $DIR_TO_USE ] ; then
       alias > "$DIR_TO_USE/sj-alias.tmp"
-      perl /home/sjohnson/bin/which_helper_partB.pl "$1"
+      perl /home/sjohnson/bin/which_helper_partB.pl "$1" "$DIR_TO_USE/sj-alias.tmp"
       rm "$DIR_TO_USE/sj-alias.tmp"
     else
       echo Cannot find the ramdisk tmp directory

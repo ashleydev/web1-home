@@ -5,21 +5,20 @@
 use strict;
 use Term::ANSIColor qw(:constants);
 
-use constant FILE_ALIASDUMP => '/tmp/tmpfs/sj-alias.tmp';
-
-my $query = shift(@ARGV);
-
-unless (length($query)) {
-  print "Usage: $0 [query]\n";
+unless (scalar(@ARGV) == 2) {
+  print "Usage: $0 [query] [file]\n";
   exit(1);
 }
 
-unless ( -f FILE_ALIASDUMP ) {
-  print "Missing ".FILE_ALIASDUMP."\n";
+my $query = shift(@ARGV);
+my $file_aliasdump = shift(@ARGV);
+
+unless ( -f $file_aliasdump ) {
+  warn "expecting but cannot find $file_aliasdump";
   exit(2);
 }
 
-open (READ, FILE_ALIASDUMP);
+open (READ, $file_aliasdump);
 
 while (<READ>) {
 
