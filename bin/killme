@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+
+use strict;
+use v5.10.0;
+
+use Term::ANSIColor qw(:constants);
+
+# get the current bash ID and record it so you do not kill it later
+my $safe_process_id;
+foreach (split(/\n/, `ps`)) {
+  next unless m/bash$/;
+
+  if (m/^\d+/) {
+    $safe_process_id = $&;
+    last;
+  }
+}
+
+unless (defined($safe_process_id)) {
+  say "Cannot ascertain your bash PID!";
+  exit(1);
+}
+
+my @other_bash_pids;
+foreach (split(/\n/, `ps u`)) {
+  next unless m/bash$/;
+
+  my @ps_chunks = split(/\s+/);
+  my $pid = $ps_chunks[1];
+
+  if ($pid =~ m/^\d+$/) {
+    next if $safe_process_id == $pid; # do not do anything with the safe pid
+    push (@other_bash_pids, $pid);
+  }
+}
+
+unless (@other_bash_pids) {
+  say "Nothing to kill.  Exiting.";
+  exit(0);
+}
+
+foreach (@other_bash_pids) {
+  if (system('kill', '-9', $_) == 0) {
+    say BOLD, GREEN, "killing $_", RESET;
+  } else {
+    say BOLD, RED, "failed to kill $_ ?", RESET;
+  }
+}
