@@ -11,13 +11,20 @@ my $file;
 my $flag_stdin;
 my $delim;
 
+use constant DIR_RAMDRIVE => '/tmp/tmpfs';
+use constant DIR_TMP => '/tmp';
+my $tmp_filedir;
 
-my $tmp_filedir = "/tmp/tmpfs/";
+if (-d DIR_RAMDRIVE) {
+  $tmp_filedir = DIR_RAMDRIVE;
+} elsif (-d DIR_TMP) {
+  $tmp_filedir = DIR_RAMDRIVE;
+} else {
+  die "Cannot establish tmp directory.";
+}
 
-if ( ! -d $tmp_filedir ) { die ("$tmp_filedir doesn't exist!"); }
 my $tmp_filename = ".tmp_awky";
-
-my $file_ram = $tmp_filedir.$tmp_filename;
+my $file_ram = "$tmp_filedir/.$tmp_filename";
 
 $file = shift(@ARGV) if ( -f $ARGV[0] );
 $delim = shift(@ARGV) if ($ARGV[0] !~ m/^\d*$/);
@@ -31,11 +38,6 @@ if (exists($ARGV[0])) {
 
     while (<STDIN>) {
       $txt .= $_;
-    }
-
-    # directory creation check
-    if ( ! -d $tmp_filedir ) {
-      mkdir($tmp_filedir);
     }
 
     open (WH, ">$file_ram");
