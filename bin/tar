@@ -38,6 +38,7 @@ unless (scalar(@ARGV) >= 2) {
   say "Command list:";
   say "\ta - add to or create archive";
   say "\tx - extract archive";
+  say "\te - extract archive";
   say "\tt - display archive contents";
   print "\n";
   exit(0);
@@ -86,7 +87,7 @@ given ($script_command) {
       
   }
 
-  when ('x') {
+  when ('x' || 'e') {
     say "Extracting archive...";
     $tar_command .= 'x';
   }
