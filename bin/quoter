@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+
+use strict;
+use v5.10.0;
+
+use constant SPACING_BETWEEN_MESSAGES => 2;
+
+###
+
+my @final_quotes; # list of strings
+my @current_quote_lines; # list of lines per string
+my $current_nickname;
+
+while (<STDIN>) {
+  next unless (m/│(.*)│?/);
+  my $segment = $1;
+  trim($segment);
+
+  if ($segment =~ m/^\d{2}:\d{2}:\d{2} \s+ (\S+) \s+ \| \s+ (.*)$/x) { # new line found
+    if (@current_quote_lines && defined($current_nickname)) {
+      push(@final_quotes, processLines($current_nickname, @current_quote_lines));
+      undef $current_nickname;
+      undef @current_quote_lines;
+    }
+
+    $current_nickname = $1;
+    push (@current_quote_lines, $2);
+  } elsif ($segment =~ m/^\| \s+ (\S+)$/x) { # continued line
+    if (! defined($current_nickname)) {
+      say "Cannot determine who's text the blurb belongs to.";
+      exit(1);
+    }
+
+    push (@current_quote_lines, $1);
+  }
+}
+
+if (@current_quote_lines && defined($current_nickname)) {
+  push(@final_quotes, processLines($current_nickname, @current_quote_lines));
+  undef $current_nickname;
+  undef @current_quote_lines;
+}
+
+say sprintf('.quote add %s', (join '  ', @final_quotes));
+
+# ---
+
+sub processLines {
+  my $nick = shift;
+  return sprintf('<%s> %s', $nick, join ' ', @_);
+}
+
+sub trim { $_[0] =~ s/^\s*//; $_[0] =~ s/\s*$//; $_[0] }
