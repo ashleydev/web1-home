@@ -83,3 +83,6 @@ if (exists($ARGV[0])) {
   print "Purpose: Shortcut to awk's popular { print } statement\n\n";
   print "Usage: $0 [file] (delim) [1] (2.. 3.. 4.. etc)\n";
 }
+
+# ---
+sub stripColors { my $text = shift; $text =~ s/\e\[(\d;)?\d{2}m//g; return $text; }
