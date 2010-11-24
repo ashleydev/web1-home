@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+
+use strict;
+use v5.10.0;
+
+my @fields;
+my $flag_raw;
+my $delimiter;
+
+foreach (@ARGV) {
+  if (m/^(-r|--raw)$/) { $flag_raw = 1; }
+  elsif (m/^\d+$/) { push(@fields, $_); }
+  else { $delimiter = $_; }
+}
+
+if (! defined($delimiter)) { $delimiter = ' '; }
+
+while (<STDIN>) {
+  chomp;
+
+  my @csv = split($delimiter);
+  my @output;
+  
+  foreach (@fields) {
+    if (defined(my $data = $csv[$_ - 1])) { push(@output, $data); }
+  }
+
+  say "@output";
+}
