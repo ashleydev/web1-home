@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+
+# purpose: simple regex character match tester
+
+use strict;
+use v5.10.0;
+
+use Term::ANSIColor qw(:constants);
+
+print "Enter a regex string: ";
+chomp(my $regex = <STDIN>);
+
+unless (length($regex)) {
+  say "No regex supplied";
+  exit(1);
+}
+
+my @results;
+
+for (32 .. 126) {
+  local $_ = chr($_);
+  push(@results, '['.BOLD.$_.RESET.']') if m/$regex/;
+}
+
+my @chunks_refs = chunk(\@results, 10);
+
+say "@$_" for @chunks_refs; # print a row of the chunks, newline per chunk
+
+say sprintf("Total: %u", scalar(@results));
+
+# ---
+sub chunk {
+
+  my $results_ref = shift;
+  my $chunk_size = shift;
+
+  my @results_siphon = @$results_ref;
+
+  my @chunks_refs; # return value
+
+  while (@results_siphon) {
+
+    my $siphon_amount;
+    if (scalar(@results_siphon) < $chunk_size) {
+      $siphon_amount = scalar(@results_siphon);
+    } else {
+      $siphon_amount = $chunk_size;
+    }
+
+    push(@chunks_refs, [ splice(@results_siphon, 0, $siphon_amount) ]);
+  }
+
+  return @chunks_refs;
+
+}

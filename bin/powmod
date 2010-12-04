@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+use strict;
+use v5.10.0;
+
+use Math::BigInt;
+
+my $generator = shift(@ARGV);
+my $exponent = eval(shift(@ARGV));
+my $modulus = shift(@ARGV);
+
+my $x = Math::BigInt->new($generator);
+
+$x->bmodpow($exponent, $modulus);
+
+say $x->bstr();

@@ -1,0 +1,106 @@
+#!/usr/bin/perl
+
+# general-purpose decimal / hex / binary number converter
+
+use strict;
+use v5.10.0;
+
+use Math::BigInt;
+use Digest::SHA1 qw(sha1_hex);
+use MIME::Base64;
+use Term::ANSIColor qw(:constants);
+
+use constant DEBUG => 0;
+
+sub nospace {
+  $_[0] =~ s/\s+//g;
+}
+
+my $flag_decimal;
+my $in_raw;
+my $decoded;
+my $x;
+
+# ----
+
+foreach (@ARGV) {
+  if ($_ eq 'dec') { $flag_decimal = 1; }
+  else { $in_raw = $_; }
+}
+
+if (! defined($in_raw)) {
+  my @lines = <STDIN>;
+
+  {
+    local $" = '';
+    $in_raw = "@lines";
+  }
+}
+
+nospace($in_raw);
+$in_raw =~ s/://g; # get rid of colons, usually in HEX stuff
+
+say "[$in_raw]" if DEBUG;
+
+if ($flag_decimal && $in_raw =~ m/^[0-9]+$/) {
+  # decimal format
+  say "Input type: decimal";
+  $x = Math::BigInt->new($in_raw);
+  my $hex = $x->as_hex();
+  $hex =~ s/^0x//;
+  $decoded = pack("H*", $hex);
+
+} elsif ($flag_decimal) {
+  say "Cannot parse decimal!";
+  exit(1);
+
+#### REGULAR PARSING ####
+
+} elsif ((length($in_raw) % 2) == 0 && $in_raw =~ m/^[0-9a-f]+$/i) {
+  # hexidecimal input
+  say "Input type: hex";
+  $decoded = pack("H*", $in_raw);
+  my $hex_formatted = "0x$in_raw";
+  $x = Math::BigInt->new($hex_formatted);
+
+} elsif ($in_raw =~ m{^[0-9A-Za-z\+/=]+$} && $in_raw !~ m/^[0-9]+$/) {
+  # base64 input
+  say "Input type: base64";
+  $decoded = decode_base64($in_raw);
+  my $hex_formatted = "0x".unpack("H*", $decoded);
+  $x = Math::BigInt->new($hex_formatted);
+
+} else {
+  say "Unable to determine input format";
+  exit(1);
+}
+
+$decoded = npdots($decoded);
+
+print "\n";
+
+if ($decoded !~ m/^.+$/) {
+  say YELLOW, "String appears to be binary", RESET;
+} else {
+  printf("%s%s%s: [%s]\n\n", WHITE, "as string", RESET, $decoded);
+}
+
+printf("%s%s%s: %s\n\n", WHITE, "as hex", RESET, $x->as_hex());
+printf("%s%s%s: %s\n\n", WHITE, "as decimal", RESET, $x->bstr());
+printf("%s%s%s: %s\n\n", WHITE, "as binary", RESET, $x->as_bin());
+printf("%s%s%s: %s\n", WHITE, "length (bytes)", RESET, (length($x->as_hex()) - 2) / 2);
+printf("%s%s%s: %s\n", WHITE, "length (bits)", RESET, length($x->as_bin()) - 2);
+printf("%s%s%s:\t\t%s\n", WHITE, "SHA-1 in_raw", RESET, sha1_hex($in_raw));
+printf("%s%s%s:\t%s\n", WHITE, "SHA-1 lc(in_raw)", RESET, sha1_hex(lc($in_raw)));
+printf("%s%s%s:\t%s\n", WHITE, "SHA-1 uc(in_raw)", RESET, sha1_hex(uc($in_raw)));
+printf("%s%s%s:\t\t%s\n", WHITE, "SHA-1 decoded", RESET, sha1_hex($decoded));
+
+print "\n";
+
+# ---
+
+sub npdots { # replace non-printable chars with dots
+  my $str = shift;
+  $str =~ s{[^\040-\176]}{BOLD.BLUE.'.'.RESET}eg;
+  return $str;
+}

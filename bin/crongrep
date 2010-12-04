@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+
+use strict;
+use v5.10.0;
+
+unless ($ENV{USER} eq 'root') {
+  say "Run this as root...";
+  exit(1);
+}
+
+my $query = shift(@ARGV);
+
+unless (length($query)) {
+  say "Please submit a query to search by.";
+  exit(1);
+}
+
+chdir('/var/spool/cron/crontabs') or die "Couldn't change directories";
+
+my $cmd = "grep -i --color=always '$query' *";
+system($cmd);

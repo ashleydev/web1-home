@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+use strict;
+use v5.10.0;
+
+use Term::ANSIColor qw(:constants);
+
+my $total = 0;
+
+while (<STDIN>) {
+  chomp;
+  s/[^\d\.\+-]//g; # only keep +, -, periods, and numbers
+  $total += $_;
+}
+
+say YELLOW, $total, RESET;

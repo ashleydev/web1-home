@@ -16,6 +16,8 @@ while (<STDIN>) {
   my $segment = $1;
   trim($segment);
 
+  #say $segment;
+
   if ($segment =~ m/^\d{2}:\d{2}:\d{2} \s+ (\S+) \s+ \| \s+ (.*)$/x) { # new line found
     if (@current_quote_lines && defined($current_nickname)) {
       push(@final_quotes, processLines($current_nickname, @current_quote_lines));
@@ -25,7 +27,9 @@ while (<STDIN>) {
 
     $current_nickname = $1;
     push (@current_quote_lines, $2);
-  } elsif ($segment =~ m/^\| \s+ (\S+)$/x) { # continued line
+  } elsif ($segment =~ m/^\| \s+ (.*)$/x) { # continued line
+
+    #say "___ found continuous line";
     if (! defined($current_nickname)) {
       say "Cannot determine who's text the blurb belongs to.";
       exit(1);

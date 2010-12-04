@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+
+# purpose:  delete files with escape characters in them
+
+use strict;
+use v5.10.0;
+
+use Term::ANSIColor qw(:constants);
+
+foreach my $badfile (glob('*'.chr(27).'*')) {
+  my $badfile_viewfriendly = npdots($badfile);
+  print "Do you want to delete [$badfile_viewfriendly]? ";
+  chomp(my $answer = <STDIN>);
+
+  if ($answer =~ m/^y(es)?$/i) {
+    my $result = unlink($badfile);
+    die "Couldn't delete!" if (-f $badfile);
+  }
+
+}
+
+sub npdots { # replace non-printable chars with dots
+  my $str = shift;
+  $str =~ s{[^\040-\176]}{BOLD.BLUE.'.'.RESET}eg;
+  return $str;
+}

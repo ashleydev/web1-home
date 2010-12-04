@@ -1,6 +1,7 @@
 # common aliases
 
 [ -f ~/.bash_aliases.colourprompt ] && . ~/.bash_aliases.colourprompt
+[ -f ~/.bash_functions ] && . ~/.bash_functions
 
 if [ "$HOSTNAME" = "web1" ] ; then
   [ -f ~/.bash_aliases.tbm ] && . ~/.bash_aliases.tbm
@@ -9,18 +10,6 @@ elif [ "$HOSTNAME" = "web2" ] ; then
   [ -f ~/.bash_aliases.tbm ] && . ~/.bash_aliases.tbm
   [ -f ~/.bash_aliases.web2 ] && . ~/.bash_aliases.web2
 fi
-
-cdc () {
-  if [ -n "$1" ] ; then
-    [ -f "$1" ] && cd `echo $1 | sed -e 's/\/[^\/]*$//'` && return
-    [ -d "$1" ] && cd "$1" && return
-    echo "$0: cd: $1: No such file or directory" && return
-  else
-    cd && return
-  fi
-}
-
-alias cd=cdc
 
 # ssh agent mode
 alias isagent='if [ "$SSH_AGENT_PID" ] ; then echo Agent is set ; else echo No ; fi'
@@ -37,7 +26,7 @@ export EDITOR=vi
 export TERM=linux
 export TERM=xterm
 
-# microsoft command land
+# DOS / microsoft command land
 alias ren='mv'
 alias copy='cp'
 alias cls='clear'
@@ -45,6 +34,7 @@ alias tree='find -type d'
 alias dirb='find $PWD'
 alias del='rm'
 alias erase='rm'
+alias notepad='vi'
 
 # GNU screen
 alias sca='screen -a'
@@ -76,6 +66,8 @@ alias g='grep -sin'
 alias mvsafe='mv --interactive'
 
 # argh!!! stoppers
+alias type='cat'
+alias lcd='cd'
 alias gerp='grep'
 alias greo='grep'
 alias greb='grep'
@@ -131,8 +123,10 @@ alias wc-l='wc -l'
 alias cfv='cfvi'
 
 # .bashrc helper
+alias bf='. ~/.bash_functions'
 alias reb='unalias -a && . ~/.bashrc'
 alias .b='vi ~/.bashrc'
+alias .bf='vi ~/.bash_functions'
 alias ,b='.b'
 alias .ba='vi ~/.bash_aliases'
 alias ,ba='.ba'

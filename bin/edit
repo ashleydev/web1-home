@@ -1,0 +1,54 @@
+#!/usr/bin/env perl
+
+use strict;
+use v5.10.0;
+
+use Data::Dumper;
+
+my $which = pop(@ARGV); # only allow editing of the last arg
+my $chosen_file;
+
+while (<STDIN>) {
+  chomp;
+
+  if (defined($which)) {
+     
+    if ( $which == $.) { # find file to edit
+
+      my @csv;
+
+      if (index($_, ' ') > index($_, ':')) {
+	@csv = split ':';
+      } else {
+	@csv = split /\s+/;
+      }
+
+      foreach (@csv) {
+	if (-f $_) {
+	  $chosen_file = $_;
+	  last;
+	}
+      }
+
+      last;
+    }
+
+  } else {
+    say "$.: $_";
+  }
+}
+
+# Khisanth debugging code below
+#system( "ls -l /proc/$$/fd/*" );
+#exit;
+
+if (defined($chosen_file)) {
+  open STDIN, "<&=", *STDOUT or die $!;
+  system($ENV{EDITOR}, $chosen_file)
+} elsif ($which > $.) {
+  say "Your query was higher than the number of lines.";
+  exit(1);
+} elsif (defined($which)) {
+  say "Sorry, couldn't determine a chosen file.";
+  exit(1);
+}
