@@ -10,3 +10,4 @@ my $color = shift(@ARGV);
 print color $color;
 print "@ARGV";
 print color 'reset';
+print "\n";
