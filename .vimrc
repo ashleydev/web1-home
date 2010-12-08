@@ -17,7 +17,6 @@ set fileencodings=ucs-bom,utf-8
 map \u :set fileencoding=latin1<CR>:w<CR>
 map \U :set fileencoding=utf-8<CR>:w<CR>
 
-
 " Tab options that Eric setup for me
 set tabstop=8
 set sw=2
@@ -42,6 +41,7 @@ map :w:w :w
 map :w\ :w
 map :qw :wq
 map :Q :q
+map :q1 :q!
 " vim grep annoyance prevention
 map :G :g 
 
