@@ -9,10 +9,17 @@ my @vim_files;
 my @vim_args;
 my @lost_and_found;
 
+my $flag_stdin;
+
 # KNOWN ISSUES, PLEASE READ
 # 1. this will only edit the realpath of the file if it already exists.   this is show it shows up easier in the process list
 # 2. even though there are lists at the top of this file declared, they are lists in case someday Eric or Mike B want the functionality changed
 #    to allow multiple editing.  If you would like to do that, make sure exec is switched to system and a foreach put in place
+
+if (! -t STDOUT) {
+  say "Preventing piping from Vim.  Exiting.";
+  exit(1);
+}
 
 foreach (@ARGV) {
   
@@ -30,6 +37,9 @@ foreach (@ARGV) {
     push(@vim_files, { file => $_, line => 1 });
   } elsif (-f $pre_colon && $post_colon =~ m/^[0-9]+$/) {
     push(@vim_files, { file => $pre_colon, line => $post_colon});
+  } elsif ($_ eq '-') {
+    $flag_stdin = 1;
+    push(@vim_args, $_);
   } elsif (m/^(\+|-)/) {
     push(@vim_args, $_);
   } else {
@@ -38,16 +48,20 @@ foreach (@ARGV) {
 
 }
 
+if (! -t STDIN && ! $flag_stdin) {
+  say "Preventing piping to Vim.  Exiting.";
+  exit(1);
+}
+
 if (my $hashref_file_data = shift(@vim_files)) {
   my $file = $hashref_file_data->{file};
   my $line = $hashref_file_data->{line};
 
   unshift(@vim_args, "+$line") if ($line > 1);
 
-  my $cmd = "vi ".realpath($file)." @vim_args";
-  exec($cmd);
+  exec('vi', realpath($file), @vim_args);
 } elsif (my $first_and_only_try = shift(@lost_and_found)) {
-  system("vi $first_and_only_try @vim_args");
+  exec('vi', $first_and_only_try, @vim_args);
 } else {
-  system("vi @vim_args");
+  exec('vi', @vim_args);
 }
