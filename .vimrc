@@ -1,6 +1,6 @@
 hi StatusLine   term=bold cterm=bold ctermfg=Yellow ctermbg=Blue          gui=bold guifg=#FFFFFF guibg=#0050EE
 
-:set visualbell t_vb=
+set visualbell t_vb=
 
 filetype plugin on " needed for NERDcommenter
 filetype indent on
