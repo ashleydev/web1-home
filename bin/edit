@@ -23,14 +23,21 @@ while (<STDIN>) {
 
       if ($index_space > -1 && $index_colon > -1) {
 	if ($index_space > $index_colon) {
+	  say "one" if DEBUG;
 	  @csv = split ':';
 	} else {
+	  say "two" if DEBUG;
 	  @csv = split /\s+/;
 	}
       } elsif ($index_space > -1 && $index_colon == -1) {
+	say "three" if DEBUG;
 	@csv = split /\s+/;
       } elsif ($index_space == -1 && $index_colon > -1) {
+	say "four" if DEBUG;
 	@csv = split ':';
+      } else {
+	say "five" if DEBUG;
+	@csv = ($_);
       }
 
       foreach (@csv) {
