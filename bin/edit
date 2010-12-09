@@ -5,6 +5,8 @@ use v5.10.0;
 
 use Data::Dumper;
 
+use constant DEBUG => 0;
+
 my $which = pop(@ARGV); # only allow editing of the last arg
 my $chosen_file;
 
@@ -16,17 +18,27 @@ while (<STDIN>) {
     if ( $which == $.) { # find file to edit
 
       my @csv;
+      my $index_space = index($_, ' ');
+      my $index_colon = index($_, ':');
 
-      if (index($_, ' ') > index($_, ':')) {
-	@csv = split ':';
-      } else {
+      if ($index_space > -1 && $index_colon > -1) {
+	if ($index_space > $index_colon) {
+	  @csv = split ':';
+	} else {
+	  @csv = split /\s+/;
+	}
+      } elsif ($index_space > -1 && $index_colon == -1) {
 	@csv = split /\s+/;
+      } elsif ($index_space == -1 && $index_colon > -1) {
+	@csv = split ':';
       }
 
       foreach (@csv) {
 	if (-f $_) {
 	  $chosen_file = $_;
 	  last;
+	} else {
+	  say "[$_] is not a file." if DEBUG;
 	}
       }
 
