@@ -9,6 +9,7 @@ use constant DEBUG => 0;
 
 my $which = pop(@ARGV); # only allow editing of the last arg
 my $chosen_file;
+my $chosen_file_linenumber;
 
 while (<STDIN>) {
   chomp;
@@ -40,13 +41,27 @@ while (<STDIN>) {
 	@csv = ($_);
       }
 
+      my $i = 0;
       foreach (@csv) {
 	if (-f $_) {
 	  $chosen_file = $_;
+
+	  if (DEBUG) {
+	    say "\$_ var: $_";
+	    say "\$csv[\$i] var: $csv[$i]";
+	    printf("\$csv[\$i+1] var: %s\n", $csv[$i+1]);
+	  }
+
+	  if ($csv[$i+1] =~ m/^\d+$/) {
+	    say "found a line number!" if DEBUG;
+	    $chosen_file_linenumber = $&;
+	  }
+
 	  last;
 	} else {
 	  say "[$_] is not a file." if DEBUG;
 	}
+	$i++;
       }
 
       last;
@@ -63,7 +78,12 @@ while (<STDIN>) {
 
 if (defined($chosen_file)) {
   open STDIN, "<&=", *STDOUT or die $!;
-  system($ENV{EDITOR}, $chosen_file)
+  if (defined($chosen_file_linenumber)) {
+    system($ENV{EDITOR}, $chosen_file, "+$chosen_file_linenumber")
+  } else {
+    system($ENV{EDITOR}, $chosen_file)
+  }
+
 } elsif ($which > $.) {
   say "Your query was higher than the number of lines.";
   exit(1);
