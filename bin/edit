@@ -11,65 +11,35 @@ my $which = pop(@ARGV); # only allow editing of the last arg
 my $chosen_file;
 my $chosen_file_linenumber;
 
+my $mode_chosen = defined($which);
+my $mode_oneline;
+
+my $line_cs;
 while (<STDIN>) {
   chomp;
+  $line_cs = colorstrip($_);
 
-  if (defined($which)) {
+  if ($mode_chosen) { # pick-mode
      
     if ( $which == $.) { # find file to edit
-
-      my @csv;
-      my $index_space = index($_, ' ');
-      my $index_colon = index($_, ':');
-
-      if ($index_space > -1 && $index_colon > -1) {
-	if ($index_space > $index_colon) {
-	  say "one" if DEBUG;
-	  @csv = split ':';
-	} else {
-	  say "two" if DEBUG;
-	  @csv = split /\s+/;
-	}
-      } elsif ($index_space > -1 && $index_colon == -1) {
-	say "three" if DEBUG;
-	@csv = split /\s+/;
-      } elsif ($index_space == -1 && $index_colon > -1) {
-	say "four" if DEBUG;
-	@csv = split ':';
-      } else {
-	say "five" if DEBUG;
-	@csv = ($_);
-      }
-
-      my $i = 0;
-      foreach (@csv) {
-	if (-f $_) {
-	  $chosen_file = $_;
-
-	  if (DEBUG) {
-	    say "\$_ var: $_";
-	    say "\$csv[\$i] var: $csv[$i]";
-	    printf("\$csv[\$i+1] var: %s\n", $csv[$i+1]);
-	  }
-
-	  if ($csv[$i+1] =~ m/^\d+$/) {
-	    say "found a line number!" if DEBUG;
-	    $chosen_file_linenumber = $&;
-	  }
-
-	  last;
-	} else {
-	  say "[$_] is not a file." if DEBUG;
-	}
-	$i++;
-      }
-
+      ($chosen_file, $chosen_file_linenumber) = searchFileInLine($line_cs);
       last;
     }
 
-  } else {
+  } else { # print-mode
     say "$.: $_";
   }
+}
+
+if (! $mode_chosen && $. == 1) {
+  $mode_oneline = 1;
+  ($chosen_file, $chosen_file_linenumber) = searchFileInLine($line_cs); # last line of while loop
+}
+
+if (DEBUG) {
+  say "chosen file: [$chosen_file]";
+  say "chosen file number: [$chosen_file_linenumber]";
+  say "definition of chosen file: ". defined($chosen_file);
 }
 
 # Khisanth debugging code below
@@ -79,9 +49,9 @@ while (<STDIN>) {
 if (defined($chosen_file)) {
   open STDIN, "<&=", *STDOUT or die $!;
   if (defined($chosen_file_linenumber)) {
-    system($ENV{EDITOR}, $chosen_file, "+$chosen_file_linenumber")
+    exec($ENV{EDITOR}, $chosen_file, "+$chosen_file_linenumber")
   } else {
-    system($ENV{EDITOR}, $chosen_file)
+    exec($ENV{EDITOR}, $chosen_file)
   }
 
 } elsif ($which > $.) {
@@ -90,4 +60,75 @@ if (defined($chosen_file)) {
 } elsif (defined($which)) {
   say "Sorry, couldn't determine a chosen file.";
   exit(1);
+}
+
+# =====
+
+sub searchFileInLine {
+  my $str = shift;
+
+  say "str: [$str]" if DEBUG;
+
+  my $chosen_file;
+  my $chosen_file_linenumber;
+
+  my @csv;
+  my $index_space = index($str, ' ');
+  my $index_colon = index($str, ':');
+
+  if ($index_space > -1 && $index_colon > -1) {
+    if ($index_space > $index_colon) {
+      say "one" if DEBUG;
+      @csv = split ':';
+    } else {
+      say "two" if DEBUG;
+      @csv = split /\s+/;
+    }
+  } elsif ($index_space > -1 && $index_colon == -1) {
+    say "three" if DEBUG;
+    @csv = split /\s+/;
+  } elsif ($index_space == -1 && $index_colon > -1) {
+    say "four" if DEBUG;
+    @csv = split ':';
+  } else {
+    say "five" if DEBUG;
+    @csv = ($str);
+  }
+
+  printf("csv: %s\n", Dumper @csv) if DEBUG;
+
+  my $i = 0;
+  foreach (@csv) {
+    if (-f $_) {
+      $chosen_file = $_;
+
+      if (DEBUG) {
+	say "\$_ var: [$_]";
+	say "\$csv[\$i] var: [$csv[$i]]";
+	printf("\$csv[\$i+1] var: [%s]\n", $csv[$i+1]);
+      }
+
+      if ($csv[$i+1] =~ m/^\d+$/) {
+	say "found a line number!" if DEBUG;
+	$chosen_file_linenumber = $&;
+      }
+
+      return ($chosen_file, $chosen_file_linenumber);
+    } else {
+      say "[$_] is not a file." if DEBUG;
+    }
+    $i++;
+  }
+
+  return undef;
+
+}
+
+sub colorstrip {
+  # taken from ANSIColor-3.00
+  my (@string) = @_;
+  for my $string (@string) {
+      $string =~ s/\e\[[\d;]*m//g;
+  }
+  return wantarray ? @string : join ('', @string);
 }
