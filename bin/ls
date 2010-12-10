@@ -8,7 +8,7 @@ my $flag_hyphen_first_arg;
 
 foreach (@ARGV) {
   when ("--hyphen_first_arg") { $flag_hyphen_first_arg = 1; }
-  when (m/^(0k|l-)$/ && ! grep(/^-l$/, @args_to_ls)) { push @args_to_ls, "-l"; }
+  when (m/^(0k|l-|_L)$/i && ! grep(/^-l$/, @args_to_ls)) { push @args_to_ls, "-l"; }
   default { push @args_to_ls, $_; }
 }
 
