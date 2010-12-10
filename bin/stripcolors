@@ -1,9 +1,0 @@
-#!/usr/bin/perl
-
-use strict;
-
-while (<>) {
-  print stripLinuxColors($_);
-}
-
-sub stripColors { my $text = shift; $text =~ s/\e\[(\d;)?\d{2}m//g; return $text; }
