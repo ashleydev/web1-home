@@ -91,8 +91,8 @@ printf("%s%s%s: %s\n\n", WHITE, "as binary", RESET, $x->as_bin());
 printf("%s%s%s: %s\n", WHITE, "length (bytes)", RESET, (length($x->as_hex()) - 2) / 2);
 printf("%s%s%s: %s\n", WHITE, "length (bits)", RESET, length($x->as_bin()) - 2);
 printf("%s%s%s:\t\t%s\n", WHITE, "SHA-1 in_raw", RESET, sha1_hex($in_raw));
-printf("%s%s%s:\t%s\n", WHITE, "SHA-1 lc(in_raw)", RESET, sha1_hex(lc($in_raw)));
-printf("%s%s%s:\t%s\n", WHITE, "SHA-1 uc(in_raw)", RESET, sha1_hex(uc($in_raw)));
+#printf("%s%s%s:\t%s\n", WHITE, "SHA-1 lc(in_raw)", RESET, sha1_hex(lc($in_raw)));
+#printf("%s%s%s:\t%s\n", WHITE, "SHA-1 uc(in_raw)", RESET, sha1_hex(uc($in_raw)));
 printf("%s%s%s:\t\t%s\n", WHITE, "SHA-1 decoded", RESET, sha1_hex($decoded));
 
 print "\n";
