@@ -121,6 +121,8 @@ alias mdkir='mkdir'
 alias alis='alias'
 alias wc-l='wc -l'
 alias cfv='cfvi'
+alias whcih='which'
+alias it='git'
 
 # .bashrc helper
 alias bf='. ~/.bash_functions'
