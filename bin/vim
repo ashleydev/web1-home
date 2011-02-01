@@ -36,7 +36,11 @@ foreach (@ARGV) {
   } elsif (-f $_) {
     push(@vim_files, { file => $_, line => 1 });
   } elsif (-f $pre_colon && $post_colon =~ m/^[0-9]+$/) {
-    push(@vim_files, { file => $pre_colon, line => $post_colon});
+    push(@vim_files, { file => $pre_colon, line => $post_colon });
+  } elsif (defined(my $gitfile = getPath_ab($_))) {
+    push(@vim_files, { file => $gitfile, line => 1 });
+  } elsif (defined(my $gitfile = getPath_ab($pre_colon)) && $post_colon =~ m/^[0-9]+$/) {
+    push(@vim_files, { file => $gitfile, line => $post_colon });
   } elsif ($_ eq '-') {
     $flag_stdin = 1;
     push(@vim_args, $_);
@@ -64,4 +68,26 @@ if (my $hashref_file_data = shift(@vim_files)) {
   exec('vi', $first_and_only_try, @vim_args);
 } else {
   exec('vi', @vim_args);
+}
+
+# ---- getRevParseCdup getPath_ab - copied from Sjohnson::Git to not rely on external files
+sub getRevParseCdup {
+  my $buffer = `git rev-parse --show-cdup`;
+  chomp($buffer);
+
+  return $buffer;
+}
+
+sub getPath_ab {
+  my $file = shift;
+
+  if ($file =~ m{^(a|b)/}) {
+    $file =~ s/^$&/getRevParseCdup($file)/e;
+
+    if (-f $file) {
+      return $file;
+    }
+  }
+
+  return undef;
 }
