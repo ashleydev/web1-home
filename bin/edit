@@ -79,17 +79,17 @@ sub searchFileInLine {
   if ($index_space > -1 && $index_colon > -1) {
     if ($index_space > $index_colon) {
       say "one" if DEBUG;
-      @csv = split ':';
+      @csv = split ':', $str;
     } else {
       say "two" if DEBUG;
-      @csv = split /\s+/;
+      @csv = split /\s+/, $str;
     }
   } elsif ($index_space > -1 && $index_colon == -1) {
     say "three" if DEBUG;
-    @csv = split /\s+/;
+    @csv = split /\s+/, $str;
   } elsif ($index_space == -1 && $index_colon > -1) {
     say "four" if DEBUG;
-    @csv = split ':';
+    @csv = split ':', $str;
   } else {
     say "five" if DEBUG;
     @csv = ($str);
