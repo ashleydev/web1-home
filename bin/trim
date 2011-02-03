@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+
+use strict;
+use v5.10.0;
+
+use Term::ANSIColor qw(:constants);
+
+my $flag_no_blanks;
+my $flag_suppress_bar;
+
+# ---
+
+my $buffer;
+
+foreach (@ARGV) {
+  if (m/^(--no-blanks|-nb)$/) { $flag_no_blanks = 1; }
+  if (m/^(--suppress-bar|-sb)$/) { $flag_suppress_bar = 1; }
+}
+
+while (<STDIN>) {
+  $_ = trim($_);
+
+  if ($flag_no_blanks && length($_) == 0) { next; }
+
+  $buffer .= "$_\n";
+}
+
+# print bar for easy copy and pasting after
+say YELLOW, "---", RESET unless $flag_suppress_bar;
+
+# print actual buffer
+say $buffer;
+
+# ----
+sub trim { my $str = shift; $str =~ s/^\s*//; $str =~ s/\s*$//; return $str; }
