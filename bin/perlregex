@@ -7,28 +7,31 @@ use v5.10.0;
 
 use Term::ANSIColor qw(:constants);
 
-print "Enter a regex string: ";
-chomp(my $regex = <STDIN>);
+for (;;) {
+  print "Enter a regex string: ";
+  chomp(my $regex = <STDIN>);
 
-unless (length($regex)) {
-  say "No regex supplied";
-  exit(1);
+  unless (length($regex)) {
+    say "No regex supplied";
+    exit(1);
+  }
+
+  my @results;
+
+  for (32 .. 126) {
+    local $_ = chr($_);
+    push(@results, '['.BOLD.$_.RESET.']') if m/$regex/;
+  }
+
+  my @chunks_refs = chunk(\@results, 10);
+
+  say "@$_" for @chunks_refs; # print a row of the chunks, newline per chunk
+
+  printf("Total: %u\n\n", scalar(@results));
+
+  # ---
 }
 
-my @results;
-
-for (32 .. 126) {
-  local $_ = chr($_);
-  push(@results, '['.BOLD.$_.RESET.']') if m/$regex/;
-}
-
-my @chunks_refs = chunk(\@results, 10);
-
-say "@$_" for @chunks_refs; # print a row of the chunks, newline per chunk
-
-say sprintf("Total: %u", scalar(@results));
-
-# ---
 sub chunk {
 
   my $results_ref = shift;
