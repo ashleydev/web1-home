@@ -4,6 +4,7 @@ use strict;
 use v5.10.0;
 
 use Cwd qw(realpath);
+use File::Basename;
 
 my @vim_files;
 my @vim_args;
@@ -59,11 +60,24 @@ if (! -t STDIN && ! $flag_stdin) {
 
 if (my $hashref_file_data = shift(@vim_files)) {
   my $file = $hashref_file_data->{file};
+  my $file_realpath = realpath($file);
   my $line = $hashref_file_data->{line};
 
   unshift(@vim_args, "+$line") if ($line > 1);
 
-  exec('vi', realpath($file), @vim_args);
+  if (-f dirname($file) . "/." . basename($file) . ".swp") {
+    my ($user, $ip, $screen_window) = getVimPsWhoInfo("vi $file_realpath");
+
+    if (defined($user) && defined($ip)) {
+      say "Found swap file from $user, from $ip" . (defined($screen_window) ? ", on screen window $screen_window" : '');
+    } else {
+      say "Found swap file, but unable to determine who is editing it.";
+    }
+
+  } else {
+    exec('vi', $file_realpath, @vim_args);
+  }
+
 } elsif (my $first_and_only_try = shift(@lost_and_found)) {
   exec('vi', $first_and_only_try, @vim_args);
 } else {
@@ -90,4 +104,30 @@ sub getPath_ab {
   }
 
   return undef;
+}
+
+sub getVimPsWhoInfo {
+  my $ps_query = shift;
+
+  my $user;
+  my $ip;
+  my $screen_window;
+
+  my $first_relevant_ps_line = (grep(/$ps_query/, split (/\n/, `ps aux`)))[0];
+  return unless defined $first_relevant_ps_line;
+
+  my @ps_chunks = split(' ', $first_relevant_ps_line);
+  $user = $ps_chunks[0];
+  my $pts = $ps_chunks[6];
+
+  my $first_relevant_who_line = (grep(/$user \s+ $pts/x, split (/\n/, `who`)))[0];
+  return unless defined($first_relevant_who_line);
+
+  my @who_chunks = split(' ', $first_relevant_who_line);
+  if ($who_chunks[5] =~ m/^\(([a-z0-9\.\-]+)?(:S.(\d+))?\)/i) {
+    $ip = $1;
+    $screen_window = $3;
+  }
+
+  return ($user, $ip, $screen_window);
 }
