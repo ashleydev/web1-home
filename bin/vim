@@ -6,6 +6,8 @@ use v5.10.0;
 use Cwd qw(realpath);
 use File::Basename;
 
+use constant DEBUG => 0;
+
 my @vim_files;
 my @vim_args;
 my @lost_and_found;
@@ -58,6 +60,8 @@ if (! -t STDIN && ! $flag_stdin) {
   exit(1);
 }
 
+my @cmd;
+
 if (my $hashref_file_data = shift(@vim_files)) {
   my $file = $hashref_file_data->{file};
   my $file_realpath = realpath($file);
@@ -65,23 +69,28 @@ if (my $hashref_file_data = shift(@vim_files)) {
 
   unshift(@vim_args, "+$line") if ($line > 1);
 
-  if (-f dirname($file) . "/." . basename($file) . ".swp") {
-    my ($user, $ip, $screen_window) = getVimPsWhoInfo("vi $file_realpath");
-
-    if (defined($user) && defined($ip)) {
-      say "Found swap file from $user, from $ip" . (defined($screen_window) ? ", on screen window $screen_window" : '');
-    } else {
-      say "Found swap file, but unable to determine who is editing it.";
-    }
-
-  } else {
-    exec('vi', $file_realpath, @vim_args);
-  }
+  @cmd = ('vi', $file_realpath, @vim_args);
 
 } elsif (my $first_and_only_try = shift(@lost_and_found)) {
-  exec('vi', $first_and_only_try, @vim_args);
+  @cmd = ('vi', $first_and_only_try, @vim_args);
 } else {
-  exec('vi', @vim_args);
+  @cmd = ('vi', @vim_args);
+}
+
+my $file_to_edit = $cmd[1];
+
+if (-f dirname($file_to_edit) . "/." . basename($file_to_edit) . ".swp") {
+  my ($user, $ip, $screen_window) = getVimPsWhoInfo("vi $file_to_edit");
+  say "finding: vi $file_to_edit" if DEBUG;
+
+  if (defined($user) && defined($ip)) {
+    say "Found swap file from $user, from $ip" . (defined($screen_window) ? ", on screen window $screen_window" : '');
+  } else {
+    say "Found swap file, but unable to determine who is editing it.";
+  }
+
+} else {
+  exec(@cmd) if @cmd;
 }
 
 # ---- getRevParseCdup getPath_ab - copied from Sjohnson::Git to not rely on external files
@@ -124,7 +133,7 @@ sub getVimPsWhoInfo {
   return unless defined($first_relevant_who_line);
 
   my @who_chunks = split(' ', $first_relevant_who_line);
-  if ($who_chunks[5] =~ m/^\(([a-z0-9\.\-]+)?(:S.(\d+))?\)/i) {
+  if ($who_chunks[5] =~ m/^\((.*?)(:S.(\d+))?\)/i) {
     $ip = $1;
     $screen_window = $3;
   }
