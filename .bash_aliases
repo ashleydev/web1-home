@@ -22,9 +22,7 @@ fi
 # EXPORTS
 export EDITOR=vi
 
-# even after the nov 2009 ubuntu upgrade, you still need to run BOTH of these commands in this order to enable the behaviour you want
-export TERM=linux
-export TERM=xterm
+alias errlev='echo $?'
 
 # DOS / microsoft command land
 alias ren='mv'
@@ -37,8 +35,8 @@ alias erase='rm'
 alias notepad='vi'
 
 # GNU screen
-alias sca='screen -a'
-alias scr='screen -r -U'
+alias sca='screen -U'
+alias scr='screen -r'
 
 # better default actions
 alias su='sudo -s'
@@ -67,6 +65,7 @@ alias mvsafe='mv --interactive'
 
 # argh!!! stoppers
 alias type='cat'
+alias iv='vi'
 alias lcd='cd'
 alias gerp='grep'
 alias greo='grep'
@@ -141,6 +140,7 @@ alias ph='perldoc -f'
 
 # home directory tools
 alias .v='vi ~/.vimrc'
+alias .s='vi ~/.screenrc'
 alias .i='vi ~/.inputrc'
 alias .p='vi ~/.profile'
 alias bin='cd ~/bin'
