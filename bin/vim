@@ -18,6 +18,7 @@ my $flag_stdin;
 # 1. this will only edit the realpath of the file if it already exists.   this is show it shows up easier in the process list
 # 2. even though there are lists at the top of this file declared, they are lists in case someday Eric or Mike B want the functionality changed
 #    to allow multiple editing.  If you would like to do that, make sure exec is switched to system and a foreach put in place
+# 3. if it cannot detect who is editing the file, it is because the commandline used by the editor in the first place is using relative paths
 
 if (! -t STDOUT) {
   say "Preventing piping from Vim.  Exiting.";
@@ -78,9 +79,17 @@ if (my $hashref_file_data = shift(@vim_files)) {
 }
 
 my $file_to_edit = $cmd[1];
+say "file to edit var: $file_to_edit" if DEBUG;
+my $file_to_edit_dirname = dirname($file_to_edit);
+my $file_to_edit_basename = basename($file_to_edit);
 
-if (defined($file_to_edit) && -f dirname($file_to_edit) . "/." . basename($file_to_edit) . ".swp") {
-  my ($user, $ip, $stat, $screen_window) = getVimPsWhoInfo("vi $file_to_edit");
+if ($file_to_edit_basename !~ m/^\./) {
+  # add period to filename if none found
+  $file_to_edit_basename = ".$file_to_edit_basename";
+}
+
+if (defined($file_to_edit) && -f "$file_to_edit_dirname/$file_to_edit_basename.swp") {
+  my ($user, $ip, $stat, $screen_window) = getVimPsWhoInfo("vim? $file_to_edit");
   say "ps query: vi $file_to_edit" if DEBUG;
 
   my $buf;
