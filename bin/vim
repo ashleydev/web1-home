@@ -162,7 +162,8 @@ sub getVimPsWhoInfo {
   return unless defined($first_relevant_who_line);
 
   my @who_chunks = split(' ', $first_relevant_who_line);
-  if ($who_chunks[5] =~ m/^\((.*?)(:S.(\d+))?\)/i) {
+  my $host_info = pop(@who_chunks);
+  if ($host_info =~ m/^\((.*?)(:S.(\d+))?\)/i) {
     $ip = $1;
     $screen_window = $3;
   }
