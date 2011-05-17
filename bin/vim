@@ -25,7 +25,7 @@ if (! -t STDOUT) {
 }
 
 foreach (@ARGV) {
-  
+
   my ($pre_colon, $post_colon) = split(/:/);
 
   # disallow directories
@@ -79,15 +79,34 @@ if (my $hashref_file_data = shift(@vim_files)) {
 
 my $file_to_edit = $cmd[1];
 
-if (-f dirname($file_to_edit) . "/." . basename($file_to_edit) . ".swp") {
-  my ($user, $ip, $screen_window) = getVimPsWhoInfo("vi $file_to_edit");
-  say "finding: vi $file_to_edit" if DEBUG;
+if (defined($file_to_edit) && -f dirname($file_to_edit) . "/." . basename($file_to_edit) . ".swp") {
+  my ($user, $ip, $stat, $screen_window) = getVimPsWhoInfo("vi $file_to_edit");
+  say "ps query: vi $file_to_edit" if DEBUG;
 
+  my $buf;
+
+  # check for user and ip from 'who' command
   if (defined($user) && defined($ip)) {
-    say "Found swap file from $user, from $ip" . (defined($screen_window) ? ", on screen window $screen_window" : '');
+    $buf .= "Found swap file from $user, from $ip";
+
+    # check if screen window provided
+    if (defined($screen_window)) {
+      if ($ENV{USER} eq $user && $ENV{WINDOW} eq $screen_window) {
+	$buf .= ", on your current window ($screen_window)";
+      } else {
+	$buf .= ", on screen window $screen_window";
+      }
+    }
+
   } else {
-    say "Found swap file, but unable to determine who is editing it.";
+    $buf .= "Found swap file, but unable to determine who is editing it.";
   }
+
+  if (defined($stat) && $stat eq 'T') {
+    $buf .= " (backgrounded)";
+  }
+
+  print "$buf\n";
 
 } else {
   exec(@cmd) if @cmd;
@@ -128,6 +147,7 @@ sub getVimPsWhoInfo {
   my @ps_chunks = split(' ', $first_relevant_ps_line);
   $user = $ps_chunks[0];
   my $pts = $ps_chunks[6];
+  my $stat = $ps_chunks[7];
 
   my $first_relevant_who_line = (grep(/$user \s+ $pts/x, split (/\n/, `who`)))[0];
   return unless defined($first_relevant_who_line);
@@ -138,5 +158,5 @@ sub getVimPsWhoInfo {
     $screen_window = $3;
   }
 
-  return ($user, $ip, $screen_window);
+  return ($user, $ip, $stat, $screen_window);
 }
