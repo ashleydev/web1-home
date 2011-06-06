@@ -7,7 +7,7 @@ use Cwd qw(realpath);
 use File::Basename;
 use Data::Dumper;
 
-use constant DEBUG => 0;
+my $flag_debug = 0; # used to print out verbose details while this script runs
 
 my @vim_files;
 my @vim_args;
@@ -47,7 +47,7 @@ Section B) Features and how to use them:
 2. Write a .sh bootstrapper script to fire up this perl script.  I use the file /home/sjohnson/vi_perl_starter.sh.  This also doesn't need to be in the PATH.
    The contents of this file look something like this:
 
-   exec perl /home/sjohnson/bin/vim.pl --group-write=wheel /home/something/important --group-write=www-data /home/other/stuff --switch-screen=1 $*
+   exec perl /home/sjohnson/bin/vim.pl --group-write=wheel /home/something/important --group-write=www-data /home/other/stuff --switch-screen=1 "$@"
 
 3. Edit your .bashrc (or .bash_aliases, whichever you prefer) and add the following export, changing it to suit your own absolute path, of course:
 
@@ -102,16 +102,41 @@ if (! -t STDOUT) {
   exit(1);
 }
 
+# scan for debug arg first, since regular @ARGV parsing will undef arguments
+foreach (@ARGV) {
+  if (! $flag_debug && $_ eq '--debug') {
+    $flag_debug = 1;
+
+    # copy original @ARGV array, because it will be modified now and later.
+    my @original_argv = @ARGV;
+
+    # get rid of @ARGV's --debug flag, now that it has been processed.
+    $_ = undef;
+
+    # display all ARGV originals
+    my $i = 0;
+    printList('original ARGVs', @original_argv);
+  }
+}
+
+# counter to process @ARGVs.  starts at -1 so that the first iteration of the foreach loop increases it to start it off at 0.
 my $i = -1;
+my $allow_next_argv;
+
 foreach (@ARGV) {
   ++$i;
 
   next if ! defined;
 
+  say "after defined check, arg: [$_]" if $flag_debug;
+
   my ($pre_colon, $post_colon) = split(/:/);
 
-  # disallow directories
-  if (-d $_) {
+  if ($allow_next_argv) {
+    push(@vim_args, $_);
+    undef $allow_next_argv;
+  } elsif (-d $_) {
+    # disallow directories
     say "$_ is a directory.";
     exit(1);
   } elsif (-d $pre_colon) {
@@ -120,7 +145,7 @@ foreach (@ARGV) {
   } elsif ($_ eq '--switch-screen-warning') {
     $flag_switch_screen_warning = 1;
   } elsif (m/^--switch-screen(=(\d+))?$/) { # only allow [s]econds
-    say "feature enabled: switch screen" if DEBUG;
+    say "feature enabled: switch screen" if $flag_debug;
     $flag_switch_screen = 1;
     $time_switch_screen_warn = $2;
   } elsif (m/^--(user|group)-write=(.+)$/) {
@@ -156,6 +181,11 @@ foreach (@ARGV) {
   } elsif ($_ eq '-') {
     $flag_stdin = 1;
     push(@vim_args, $_);
+  } elsif ($_ eq '-c') {
+    push(@vim_args, $_);
+    # this vim argument expects the next ARGV to be a command to execute, so set the flag to allow it to do so without scrutiny
+    say "setting allow_next_argv toggle..." if $flag_debug;
+    $allow_next_argv = 1;
   } elsif (m/^(\+|-)/) {
     push(@vim_args, $_);
   } else {
@@ -199,6 +229,15 @@ if (my $hashref_file_data = shift(@vim_files)) {
 
 my $file_to_edit = $cmd[1];
 
+if ($flag_debug) {
+
+  # display all @cmd values
+  printList('vi cmd', @cmd);
+
+  # pause for debug mode.
+  pauseMsg() if $flag_debug;
+}
+
 if (defined($file_to_edit)) {
 
   my $file_to_edit_dirname = dirname($file_to_edit);
@@ -212,7 +251,7 @@ if (defined($file_to_edit)) {
   if (-f "$file_to_edit_dirname/$file_to_edit_basename.swp") {
 
     my $ps_query_regex = "vim? $file_to_edit";
-    say "ps query: $ps_query_regex" if DEBUG;
+    say "ps query: $ps_query_regex" if $flag_debug;
     my ($user, $ip, $stat, $screen_window) = getVimPsWhoInfo($ps_query_regex);
 
     my $buf;
@@ -321,30 +360,45 @@ sub askToChangePermission {
 
     when ('user') {
      my @cmd_chown = ('sudo', 'chown', $hashref->{name}, $file);
-     say Dumper @cmd_chown if DEBUG;
+     say Dumper @cmd_chown if $flag_debug;
      system(@cmd_chown);
 
      my @cmd_chmod = ('sudo', 'chmod', 'u+w', $file);
-     say Dumper @cmd_chmod if DEBUG;
+     say Dumper @cmd_chmod if $flag_debug;
      system(@cmd_chmod);
     }
 
     when ('group') {
      my @cmd_chgrp = ('sudo', 'chgrp', $hashref->{name}, $file);
-     say Dumper @cmd_chgrp if DEBUG;
+     say Dumper @cmd_chgrp if $flag_debug;
      system(@cmd_chgrp);
 
      my @cmd_chmod = ('sudo', 'chmod', 'g+w', $file);
-     say Dumper @cmd_chmod if DEBUG;
+     say Dumper @cmd_chmod if $flag_debug;
      system(@cmd_chmod);
     }
 
     die "unknown group/user mode";
   }
 
-  if (DEBUG) {
-    say "Pausing, press enter...";
-    my $dummy = <STDIN> if DEBUG; # line pause
-  }
+  pauseMsg() if $flag_debug;
 
+}
+
+sub pauseMsg {
+  print "Press enter to continue . . .";
+  my $dummy = <STDIN>;
+}
+
+sub printList {
+  my $title = shift;
+  if (@_) {
+    my $i = 0;
+    foreach (@_) {
+      say $title.'['.$i.'] = ['.$_.']';
+      ++$i;
+    }
+  } else {
+    say "Empty array for: $title";
+  }
 }
