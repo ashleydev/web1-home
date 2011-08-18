@@ -25,15 +25,16 @@ my @permission_hashrefs;
 Section A) Why this script was created:
 =======================================
 
-- hated being told by Vim that I was accidently piping something to it without the - argument.
-- hated piping something from vim to something like grep, and seeing all the garbage on the screen from this mistake.
-- hated being prompted with a question that someone else is editing a file.  "Then don't edit it, then!  Quit asking me!" is the attitude I have.
-- hated being told I was editing a file already in a different GNU screen window.  Then switch the goddamn window for me! (optional switch in this script)
-- hated editing a file, THEN being told I didn't have permission to edit it in the first place.  Now you can specify directories and which group to set the write to.
-- hated that grep's -n argument to also print which line of the file wasn't enough to tell vim to edit a file on that line if you copy and paste it with your mouse.
-- hated accidently putting a space in the filename and having vim tell me that there were "2 more files to edit" all the time.
-- hated editing a directory by accident cause of auto complete and it firing it up its file manager.
-- hated using the up-arrow and executing a command like this, because I forgot to remove the previous command:   vi md5sum /some/file.  Now it will edit it.
+- Hated being told by Vim that I was accidently piping something to it without the - argument.
+- Hated piping something from vim to something like grep, and seeing all the garbage on the screen from this mistake.
+- Hated being prompted with a question that someone else is editing a file.  "Then don't edit it, then!  Quit asking me!" is the attitude I have.
+- Hated being told I was editing a file already in a different GNU screen window.  Then switch the goddamn window for me! (optional switch in this script)
+- Hated editing a file, THEN being told I didn't have permission to edit it in the first place.  Now you can specify directories and which group to set the write to.
+- Hated that grep's -n argument to also print which line of the file wasn't enough to tell vim to edit a file on that line if you copy and paste it with your mouse.
+- Hated accidently putting a space in the filename and having vim tell me that there were "2 more files to edit" all the time.
+- Hated editing a directory by accident cause of auto complete and it firing it up its file manager.
+- Hated using the up-arrow and executing a command like this, because I forgot to remove the previous command:   vi md5sum /some/file.  Now it will edit it.
+- Hated git diff which used a/ & b/ paths and having to convert them back to real filenames.  Now you can edit them as is!
 
   Now, I realize that it's probably possible to do the vim screen switching via Vim itself (maybe with a script), but it would take me longer to find it, and get it working,
   and likely it wouldn't work the way I want.  I find writing a front-end gives you complete control.
@@ -94,6 +95,12 @@ Section D) Known issues
 5. group and user changing is not possible due to limitations of the hash.  perhaps the hash fields could be nested.  also perhaps the way should change too..
    --group(-write)?  i'll decide if it's worth it if i get some free time...
 6. someday program an infinite loop check to see that the editor being called is not the script itself.
+
+
+Section E) Todo features
+=======================
+
+1. Add warning to vim.pl frontend where it shows in a different color that your position may be different.  Perhaps even make it bright-red to show the line number.
 
 =cut
 
@@ -319,22 +326,27 @@ sub getPath_ab {
 sub getVimPsWhoInfo {
   my $ps_query = shift;
 
-  my $user;
   my $ip;
   my $screen_window;
 
   my $first_relevant_ps_line = (grep(/$ps_query/, split (/\n/, `ps aux`)))[0];
-  return unless defined $first_relevant_ps_line;
+  if (! defined($first_relevant_ps_line)) {
+    say 'returning undef due to no relevant "ps line"' if $flag_debug;
+    return;
+  }
 
   my @ps_chunks = split(' ', $first_relevant_ps_line);
-  $user = $ps_chunks[0];
   my $pts = $ps_chunks[6];
   my $stat = $ps_chunks[7];
 
-  my $first_relevant_who_line = (grep(/$user \s+ $pts/x, split (/\n/, `who`)))[0];
-  return unless defined($first_relevant_who_line);
+  my $first_relevant_who_line = (grep(/\s+ $pts/x, split (/\n/, `who`)))[0];
+  if (! defined($first_relevant_who_line)) {
+    say 'returning undef due to no relevant "who line"' if $flag_debug;
+    return;
+  }
 
   my @who_chunks = split(' ', $first_relevant_who_line);
+  my $user = $who_chunks[0];
   my $host_info = pop(@who_chunks);
   if ($host_info =~ m/^\((.*?)(:S.(\d+))?\)/i) {
     $ip = $1;
@@ -359,23 +371,23 @@ sub askToChangePermission {
   given($hashref->{section}) {
 
     when ('user') {
-     my @cmd_chown = ('sudo', 'chown', $hashref->{name}, $file);
-     say Dumper @cmd_chown if $flag_debug;
-     system(@cmd_chown);
+      my @cmd_chown = ('sudo', 'chown', $hashref->{name}, $file);
+      say Dumper @cmd_chown if $flag_debug;
+      system(@cmd_chown);
 
-     my @cmd_chmod = ('sudo', 'chmod', 'u+w', $file);
-     say Dumper @cmd_chmod if $flag_debug;
-     system(@cmd_chmod);
+      my @cmd_chmod = ('sudo', 'chmod', 'u+w', $file);
+      say Dumper @cmd_chmod if $flag_debug;
+      system(@cmd_chmod);
     }
 
     when ('group') {
-     my @cmd_chgrp = ('sudo', 'chgrp', $hashref->{name}, $file);
-     say Dumper @cmd_chgrp if $flag_debug;
-     system(@cmd_chgrp);
+      my @cmd_chgrp = ('sudo', 'chgrp', $hashref->{name}, $file);
+      say Dumper @cmd_chgrp if $flag_debug;
+      system(@cmd_chgrp);
 
-     my @cmd_chmod = ('sudo', 'chmod', 'g+w', $file);
-     say Dumper @cmd_chmod if $flag_debug;
-     system(@cmd_chmod);
+      my @cmd_chmod = ('sudo', 'chmod', 'g+w', $file);
+      say Dumper @cmd_chmod if $flag_debug;
+      system(@cmd_chmod);
     }
 
     die "unknown group/user mode";
