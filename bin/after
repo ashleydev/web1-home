@@ -1,0 +1,69 @@
+#!/usr/bin/perl
+
+use strict;
+use v5.10.0;
+
+my $flag_debug;
+
+unless (@ARGV) {
+  say STDERR "Usage: $0 [time in am/pm form]";
+  exit(1);
+}
+
+my $specified_hour;
+
+foreach (@ARGV) {
+  when ('--debug') { $flag_debug = 1; }
+
+  if (! defined($specified_hour)) {
+    $specified_hour = $_;
+  } else {
+    say STDERR "Too many arguments!";
+    exit(1);
+  }
+  
+}
+
+my $flag_pm;
+
+# find out if it's AM or PM
+given ($specified_hour) {
+  when (m/am$/i) { }
+  when (m/pm$/i) { $flag_pm = 1; }
+}
+
+my $specified_hour_formatted;
+if ($specified_hour =~ m/^\d+/) {
+  $specified_hour_formatted = $&;
+  if ($flag_pm) { $specified_hour_formatted += 12; }
+} else {
+  say STDERR "Unknown time format!";
+  exit(1);
+}
+
+if ($specified_hour_formatted >= 0 && $specified_hour_formatted <= 24) {
+
+  my $hour_current;
+
+  # get current hour
+  my $date = `date`;
+  if ($date =~ m/\s+(\d{2}):/) {
+    $hour_current = $1;
+  } else {
+    say STDERR "Couldn't parse the 'date' command!";
+    exit(1);
+  }
+
+  if ($flag_debug) {
+    say "hour_current: $hour_current";
+    say "specified_hour_formatted: $specified_hour_formatted";
+  }
+
+  if ($hour_current >= $specified_hour_formatted) {
+    say "Passed the test" if $flag_debug;
+    exit(0); 
+  } else {
+    say "Failed the test" if $flag_debug;
+    exit(1);
+  }
+}
