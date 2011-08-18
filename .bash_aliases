@@ -1,5 +1,8 @@
 # common aliases
 
+# EXPORTS
+export EDITOR='/home/sjohnson/vi_perl_starter.sh'
+
 [ -f ~/.bash_aliases.colourprompt ] && . ~/.bash_aliases.colourprompt
 [ -f ~/.bash_functions ] && . ~/.bash_functions
 
@@ -19,9 +22,6 @@ if [ "$SSH_AGENT_PID" ] ; then
   PS1=[${BRIGHT_GREEN}AGENT${RESET}]\ "$PS1"
 fi
 
-# EXPORTS
-export EDITOR=vi
-
 alias errlev='echo $?'
 
 # DOS / microsoft command land
@@ -36,7 +36,7 @@ alias notepad='vi'
 
 # GNU screen
 alias sca='screen -U'
-alias scr='screen -r'
+alias scr='screen -r || screen -U'
 
 # better default actions
 alias su='sudo -s'
@@ -49,7 +49,8 @@ alias df='df -h'
 alias cg="sudo perl ~sjohnson/bin-tbm/crongrep"
 
 # vi harmony
-alias vi='vim'
+alias vim='vi'
+alias vi="$EDITOR"
 
 # ls harmony
 alias lsl='ls -l --color=always | grep --color=never ^l'
@@ -64,6 +65,8 @@ alias g='grep -sin'
 alias mvsafe='mv --interactive'
 
 # argh!!! stoppers
+alias gvin='gvim'
+alias ji='vi'
 alias type='cat'
 alias iv='vi'
 alias lcd='cd'
@@ -126,10 +129,10 @@ alias it='git'
 # .bashrc helper
 alias bf='. ~/.bash_functions'
 alias reb='unalias -a && . ~/.bashrc'
-alias .b='vi ~/.bashrc'
-alias .bf='vi ~/.bash_functions'
+alias .b='$EDITOR ~/.bashrc'
+alias .bf='$EDITOR ~/.bash_functions'
 alias ,b='.b'
-alias .ba='vi ~/.bash_aliases'
+alias .ba='$EDITOR ~/.bash_aliases'
 alias ,ba='.ba'
 
 # tmp directory helper
@@ -139,10 +142,10 @@ alias tmp="cd /tmp"
 alias ph='perldoc -f'
 
 # home directory tools
-alias .v='vi ~/.vimrc'
-alias .s='vi ~/.screenrc'
-alias .i='vi ~/.inputrc'
-alias .p='vi ~/.profile'
+alias .v='$EDITOR ~/.vimrc'
+alias .s='$EDITOR ~/.screenrc'
+alias .i='$EDITOR ~/.inputrc'
+alias .p='$EDITOR ~/.profile'
 alias bin='cd ~/bin'
 
 # git shortcuts
