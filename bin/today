@@ -1,14 +1,8 @@
 #!/usr/bin/perl
 
-#use String::Strip;
-#use Data::Dumper;
-
 use strict;
-
-# START ---------------------- 
 
 my $date = `date '+\%b \%_d'`;
 chomp($date);
+# improper use of system() on purpose, to just make the pipe work.
 system("ls -lA | grep '$date'");
-
-# END ---------------------- 
