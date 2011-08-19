@@ -1,0 +1,229 @@
+#!/usr/bin/perl
+
+use strict;
+use v5.10.0;
+
+use Text::Trim;
+
+use constant DEBUG => 0;
+use constant INDENT => '  ';
+use Term::ANSIColor qw(:constants);
+
+my $sql;
+my @in_brackets;
+my $prefix;
+
+printHelpSection();
+
+my @lines = <STDIN>;
+
+trim(@lines);
+
+my @table_info = split(' ', shift(@lines));
+my $table_name = $table_info[0];
+
+if (scalar(@table_info) == 2) {
+  $prefix = $table_info[1];
+}
+
+if ($table_name !~ m/^[a-z0-9_]+$/) {
+  say "Bad table name";
+  exit(1);
+}
+
+say "table name: [$table_name]" if DEBUG;
+
+$sql .= "CREATE TABLE `$table_name` (\n";
+
+if (! defined($prefix)) {
+  foreach (split('_', $table_name)) {
+    next unless length;
+    $prefix .= substr($_, 0, 1);
+  }
+}
+
+say "prefix: [$prefix]" if DEBUG;
+
+my $primary_key;
+my %unique_key;
+my %key;
+
+foreach (@lines) {
+  next unless length;
+
+  my $sql_field = INDENT;
+
+  say "line: $_" if DEBUG;
+
+  my @field_data = split(' ', $_);
+  my $count_field_data = scalar(@field_data);
+
+  say "count of fields: $count_field_data" if DEBUG;
+
+  my $field_name = $prefix.'_'.$field_data[0];
+  my $field_datatype = $field_data[1];
+
+  # capitalize all datatypes, before it gets to the brackets.  ex:  enum('Pig','cow') -> ENUM('Pig','cow')
+  $field_datatype =~ s/^[^\(]+/uc($&)/e;
+  my $field_flags;
+  my @field_keys;
+
+  if ($count_field_data < 2) {
+    die "Not enough field data!";
+  } elsif ($count_field_data == 3) {
+    if ($field_data[2] =~ m/=/) {
+      # likely the key data
+      @field_keys = split(',' => $field_data[2]);
+    } else {
+      # likely to be flags
+      $field_flags = lc($field_data[2]);
+    }
+  } elsif ($count_field_data == 4) {
+    # likely flags are first, keys are next
+    $field_flags = lc($field_data[2]);
+    @field_keys = split(',' => $field_data[3]);
+  }
+
+
+  if (DEBUG) {
+    say "field name: [$field_name]";
+    say "field datatype: [$field_datatype]";
+    say "field flags: [$field_flags]";
+  }
+
+  # verify integrity of field_name
+  if ($field_name !~ m/^[a-z0-9_]+$/) {
+    say "Bad field: $field_name";
+    exit(1);
+  }
+
+  $sql_field .= "`$field_name` $field_datatype";
+
+  # process flags
+  my $default_set;
+  my @flags;
+  if ($field_flags =~ m/\*/) { $primary_key = $field_name; }
+  if ($field_flags =~ m/u/) { push(@flags, "unsigned"); }
+
+  if ($field_flags =~ m/n/) {
+    die "default already set!" if $default_set;
+    push(@flags, "DEFAULT NULL");
+    $default_set = 1;
+  } else {
+    push(@flags, "NOT NULL");
+  }
+
+  if ($field_flags =~ m/a/) { push(@flags, "AUTO_INCREMENT"); }
+  if ($field_flags =~ m/o/) {
+    die "default already set!" if $default_set;
+    push(@flags, "DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+    $default_set = 1;
+  }
+  if ($field_flags =~ m/t/) {
+    die "default already set!" if $default_set;
+    push(@flags, "DEFAULT CURRENT_TIMESTAMP");
+    $default_set = 1;
+  }
+
+  if (@flags) {
+    $sql_field .= " ".join(" ", @flags);
+  }
+
+  push(@in_brackets, $sql_field);
+
+  # process optional keys
+  foreach (@field_keys) {
+    if (m/^(u)?key \s* = \s* (.+)$/ix) {
+
+      my $key_type = lc($1);
+      my $key_name = $prefix.'_'.$key_type.'i_'.$2;
+
+      if ($key_name !~ m/^[a-z0-9_]+$/) {
+	say "Bad key: $field_name";
+	exit(1);
+      }
+
+      if ($key_type eq 'u') {
+	# process 'unique key'
+	if (exists($unique_key{$key_name})) {
+	  push(@{ $unique_key{$key_name} }, $field_name);
+	} else {
+	  $unique_key{$key_name} = [ $field_name ];
+	}
+
+      } else {
+	# process regular 'key'
+	if (exists($key{$key_name})) {
+	  push(@{ $key{$key_name} }, $field_name);
+	} else {
+	  $key{$key_name} = [ $field_name ];
+	}
+      }
+    } else {
+      die "unexpected key parameter";
+    }
+  } # end of field foreach
+
+}
+
+if (defined($primary_key)) {
+  push(@in_brackets, INDENT."PRIMARY KEY (`$primary_key`)");
+}
+
+# process 'unique key's
+if (%unique_key) {
+  foreach my $ukey (keys(%unique_key)) {
+    my $line_unique_key = INDENT."UNIQUE KEY `$ukey` ("; # fixme make regex check again
+
+    my @fields;
+    foreach my $field_name (@{ $unique_key{$ukey} }) {
+      push(@fields, "`$field_name`");
+    }
+
+    if (! @fields) { die "no fields?!"; }
+
+    $line_unique_key .= join("," => @fields);
+    $line_unique_key .= ")";
+    push(@in_brackets, $line_unique_key);
+  }
+}
+
+# process 'key's
+if (%key) {
+  foreach my $ukey (keys(%key)) {
+    my $line_unique_key = INDENT."KEY `$ukey` ("; # fixme make regex check again
+
+    my @fields;
+    foreach my $field_name (@{ $key{$ukey} }) {
+      push(@fields, "`$field_name`");
+    }
+
+    if (! @fields) { die "no fields?!"; }
+
+    $line_unique_key .= join(", " => @fields);
+    $line_unique_key .= ")";
+    push(@in_brackets, $line_unique_key);
+  }
+}
+
+$sql .= join(",\n" => @in_brackets)."\n)\n";
+
+say YELLOW.$sql.RESET;
+
+sub printHelpSection {
+  my $buffer =
+
+q{example:
+}.GREEN.q{
+some_new_table
+id INT *AU
+name VARCHAR(25) ukey=key1
+date DATE ukey=key1
+type ENUM('pig','cow','chicken') key=type
+datechanged DATETIME
+datecreated DATETIME
+
+}.RESET;
+
+  print $buffer;
+}
