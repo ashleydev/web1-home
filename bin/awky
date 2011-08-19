@@ -3,27 +3,47 @@
 use strict;
 use v5.10.0;
 
+use Data::Dumper;
+
 my @fields;
-my $flag_raw;
+my $flag_debug;
 my $delimiter;
 
 foreach (@ARGV) {
-  if (m/^(-r|--raw)$/) { $flag_raw = 1; }
+  if ($_ eq '--debug') { $flag_debug = 1; }
   elsif (m/^\d+$/) { push(@fields, $_); }
-  else { $delimiter = $_; }
+  elsif (! defined($delimiter)) { $delimiter = $_; }
+  else {
+    say "Unknown argument.  Exiting.";
+    exit(1);
+  }
 }
 
-if (! defined($delimiter)) { $delimiter = ' '; }
+unless (@fields) {
+  say "usage: ls -l | $0 2 3 1";
+  exit(1);
+}
 
 while (<STDIN>) {
   chomp;
 
-  my @csv = split($delimiter);
-  my @output;
+  # split lines
+  my @csv;
+  if (defined($delimiter)) {
+    @csv = split($delimiter, $_);
+  } else {
+    @csv = split(' ', $_);
+  }
+
+  # debug info, optional
+  say Dumper @csv if $flag_debug;
   
+  # process into space delimited output
+  my @output;
   foreach (@fields) {
     if (defined(my $data = $csv[$_ - 1])) { push(@output, $data); }
   }
 
+  # display
   say "@output";
 }
