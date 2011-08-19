@@ -1,0 +1,31 @@
+This is my userland base I use at work, and on any other computer I use with a unix-like OS.
+
+I've found that I've become entirely dependant on using it, so I can honestly say it's stood the test of time.  It keeps my .vim settings consistent as well as provides many simple perl script tools I wrote myself.
+
+My magnum opus here though is the bin/vim.pl script, which has saved me from thousands of headaches.  Have a look at it in this repo and read the comments to get an idea of what it can do you for you, if you use Vim.  I told a few others what this script can do, and I have a few happy users.
+
+Other useful things I use on a daily basis in the bin directory:
+
+abs       - STDIN / cmdline argument absolute path converter.  I use this all the time!
+add       - Quick way to do math via a tally based on newlines
+after     - returns an exit code if it's after a certain hour.  ex. after 4pm && echo "beer time"
+awky      - does arguably the most common use for awky, printing columns, without the hassle of writing in awk.  ex:  ls -l | awky 5 2 1
+get       - hexidecimal / decimal converter and diagnostic tool.  I used this very often trying to reverse engineer an MSN encryption application
+hl        - similar to grep, but highlights a query so you can see the entire context still
+killme    - good for killing everything but your current shell.  useful when the shit hits the fan.  (not perfect, but good enough)
+lc / uc   - lowercase / uppercase STDIN or a file
+lg        - line grabber, useful for grabbing lines from STDIN or a file via ranges, single integers, etc
+ls        - frontend for ls.  Say goodbye to headaches. Extremely handy.
+man       - load man pages in vi!
+math      - loads up 'bc', but much more forgiving on the syntax you use
+md5       - makes md5summing of small strings easier
+ms        - mass substitution.  Takes in files via STDIN quickly make changes
+perlregex - simple test to find which characters match a small regex string
+psx       - easier way to grep the process list
+strlen    - find out the string length of a string much easier.  stdin or by argument!
+table     - my own syntax for creating SQL tables
+tar       - tired of writing tar syntax?  tired of it not detecting if it's a .bzip2 or .gz archive?  this frontend makes tar behave like rar/arj now.
+today     - find out what's been edited today.  I used this a lot before I learned git.
+trim      - simple STDIN whitespace trimmer.
+uniq.pl   - perl based uniq script, does not need input sorted.  yay.
+wipe      - reset a filesize to 0
