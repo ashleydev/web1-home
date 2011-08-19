@@ -43,7 +43,7 @@ alias su='sudo -s'
 alias less='less -i -R'
 alias lynx='lynx -nopause -accept_all_cookies'
 alias w='w -s | ~/bin/hl sjohnson | ~/bin/hl falzer --color=blue --bold | ~/bin/hl rfb --color=green'
-alias which='. /home/sjohnson/bin/which_helper_partA.sh'
+alias which='. ~/bin/which_helper_partA.sh'
 alias du='du -h'
 alias df='df -h'
 alias cg="sudo perl ~sjohnson/bin-tbm/crongrep"
