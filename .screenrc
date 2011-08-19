@@ -13,5 +13,5 @@ startup_message off
 #bindkey ^L next
 #bindkey ^H prev
 
-# experiment with 8-bit colours!
-term screen-256color
+# experiment with 8-bit colours
+#term screen-256color
