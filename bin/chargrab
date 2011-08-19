@@ -31,4 +31,4 @@ while (<READ>) {
 }
 
 print "Byte $position not found\n";
-exit(2);
+exit(1);
