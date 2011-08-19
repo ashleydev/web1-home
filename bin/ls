@@ -3,6 +3,9 @@
 use strict;
 use v5.10.0;
 
+# to get the maximum benefit of this script, set aliases that are typos of ls, and include this one too:
+# alias 'ls-'='ls --hyphen_first_arg'
+
 my @args_to_ls;
 my $flag_hyphen_first_arg;
 
