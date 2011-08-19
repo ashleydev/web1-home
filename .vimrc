@@ -1,5 +1,7 @@
 hi StatusLine   term=bold cterm=bold ctermfg=Yellow ctermbg=Blue          gui=bold guifg=#FFFFFF guibg=#0050EE
 
+color blue
+
 set visualbell t_vb=
 
 filetype plugin on " needed for NERDcommenter
@@ -28,9 +30,6 @@ set hls
 " line numbers
 set nu
 map <C-n> :set nu!<CR>
-
-" auto indent toggle (aka tab key)
-map <C-i> :if &indentexpr != ""<CR>:let old_indentexpr=&indentexpr<CR>:setl indentexpr=<CR>:else<CR>:let &l:indentexpr=old_indentexpr<CR>:endif<CR><CR>
 
 " Annoyance prevention
 map w: :w
@@ -61,10 +60,6 @@ map ,p mp%x`px
 " Case Insensitive search
 set ignorecase
 set smartcase
-
-" makes auto-indenting easier
-map <C-o> o<Tab>
-imap <C-o> <Esc>o<Tab>
 
 " Code testers.
 function CodeTest (syn)
@@ -147,3 +142,16 @@ map Z ,cu
 map \d ,cA sjohnson (<Esc>:r! date +\%d\%b\%Y \| tr 'A-Z' 'a-z' <CR>kJhxA):<Space>
 " fixme - get ,cI to work
 map \D O<Esc>,cA sjohnson (<Esc>:r! date +\%d\%b\%Y \| tr 'A-Z' 'a-z' <CR>kJhxA):<Space>
+
+" Disable arrow keys in vim to force a habit.  Turns out I like to use both!
+"noremap  <Up> ""
+"noremap! <Up> <Esc>
+"noremap  <Down> ""
+"noremap! <Down> <Esc>
+"noremap  <Left> ""
+"noremap! <Left> <Esc>
+"noremap  <Right> ""
+"noremap! <Right> <Esc>
+
+" F5 key date writer, similar to notepad
+map [15~ :r! date<CR>kJ$
