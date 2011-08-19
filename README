@@ -22,20 +22,21 @@ killme      - good for killing everything but your current shell.  useful when t
               fan via a shell infinite loop.  (not perfect, but good enough)
 lc / uc     - lowercase / uppercase STDIN or a file
 lg          - line grabber, useful for grabbing lines from STDIN or a file via ranges, integers, etc
-ls          - frontend for ls.  Say goodbye to headaches. Extremely handy.
+ls          - frontend for ls to be far more forgiving for typos and bad arguments due to keyboard
+              layouts
 man         - load man pages in vi!
 math        - loads up 'bc', but much more forgiving on the syntax you use
 md5         - makes md5summing of small strings easier
-ms          - mass substitution.  Takes in files via STDIN quickly make changes
+ms          - mass substitution.  takes in files via STDIN quickly make changes
 perlregex   - simple test to find which characters match a small regex string
 psx         - easier way to grep the process list
-strlen      - find out the string length of a string much easier.  stdin or by argument!
+strlen      - find out the string length of a string much easier.  STDIN or by argument!
 table       - my own syntax for creating SQL tables
 tar         - tired of writing tar syntax?  tired of it not detecting if it's a .bzip2 or .gz archive?
               this frontend makes tar behave like rar/arj now
 today       - find out what's been edited today.  I used this a lot before I learned git
-trim        - simple STDIN whitespace trimmer.
-uniq.pl     - perl based uniq script, does not need input sorted.  yay.
+trim        - simple STDIN whitespace trimmer
+uniq.pl     - perl based uniq script, does not need input sorted.  yay
 which_*     - this will allow you to make 'which' search aliases too, and colour code the results to
               tell the difference.  See the first script to get setup
 wipe        - reset a filesize to 0
