@@ -159,3 +159,6 @@ alias gwc='git whatchanged'
 alias gl='git log'
 alias gc='git commit'
 alias gpom='git push origin master'
+
+# shortcuts
+alias mine="ls -l | grep --colour=never $USER"
