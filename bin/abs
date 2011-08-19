@@ -1,56 +1,48 @@
 #!/usr/bin/perl
 
 use strict;
+use v5.10.0;
+
 use Cwd qw(realpath);
 
-my $flag_help;
-
+my @input;
 my @files;
 
+my %settings;
+
+# argument mode
 foreach (@ARGV) {
-  #if (m/^(--remove-blanks|-b)$/) { $flag_remove_blanks = 1; }
-  #elsif (m/^(--help|-h)$/) { $flag_help = 1; }
-  if (m/^(--help|-h)$/) { $flag_help = 1; }
-  else {
-    push(@files, $_);
+  when (m/^(-s|--strict)$/) { $settings{strict} = 1; }
+
+  push(@input, $_);
+}
+
+# failing above, STDIN mode
+unless (@input) {
+  while (<STDIN>) {
+    trim($_);
+    push(@input, $_);
   }
 }
 
-if ($flag_help) {
-
-  print "Purpose:  Returns absolute paths of files\n\n";
-  #print "\tex: $0 --remove-blanks\n";
-  #print "\tex: $0 --b\n\n";
-  print "This help screen\n";
-  print "\tex: $0 --help\n";
-  print "\tex: $0 -h\n";
-  print "\n";
-
-  exit;
-
-} else {
-
-  if ( ! @files ) { 
-
-    while (<STDIN>) {
-      push(@files, $_);
-    }
+# clean input, filter into @files
+foreach (@input) {
+  if (-f $_) {
+    push(@files, $_)
+  } elsif ($settings{strict}) {
+    say STDERR "Found bad input: [$_]";
+    exit(1);
   }
-  
-  foreach (@files) {
-
-    if (-f $_) { # checks files only
-
-      my $output = realpath($_);
-
-      if ($output) {
-	print $output."\n";
-      }
-
-    } else {
-      #print "no!\n";
-    }
-  }
-
 }
 
+# check to see if there is anything to do
+unless (@files) {
+  say STDERR "No actual files specified!";
+  exit(1);
+}
+
+# print realpaths
+say realpath($_) for @files;
+
+# --- dependencies ---
+sub trim { $_[0] =~ s/^\s+|\s+$//g; }
