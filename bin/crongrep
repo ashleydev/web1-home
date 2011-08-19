@@ -3,15 +3,17 @@
 use strict;
 use v5.10.0;
 
+use Term::ANSIColor qw(:constants);
+
 unless ($ENV{USER} eq 'root') {
-  say "Run this as root...";
+  say "Need to be root, run:   ".YELLOW."sudo $0 @ARGV".RESET;
   exit(1);
 }
 
 my $query = shift(@ARGV);
 
 unless (length($query)) {
-  say "Please submit a query to search by.";
+  say "Usage: $0 [query]";
   exit(1);
 }
 
