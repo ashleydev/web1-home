@@ -1,9 +1,0 @@
-#!/bin/sh
-
-if [ "$1" ] ; then
-  grep $1 /etc/passwd
-else
-  echo Purpose: Search the password file for a grep string
-  echo
-  echo Usage: $0 [string]
-fi
