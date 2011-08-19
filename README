@@ -2,7 +2,7 @@ This is my userland base I use at work, and on any other computer I use with a u
 
 I've found that I've become entirely dependant on using it, so I can honestly say it's stood the test of time.  It keeps my .vim settings consistent as well as provides many simple perl script tools I wrote myself.
 
-My magnum opus here though is the bin/vim.pl script, which has saved me from thousands of headaches.  I've described 10 "problems" and their solutions in the script itself, so have a look at it read the comments to get an idea of what it can do you for you, if you use Vim.  I told a few others what this script can do, and their professional lives have improved significantly.
+My magnum opus here though is the bin/vim.pl script, which has saved me from thousands of headaches.  I've described 10 "problems" and their solutions in the script itself, so have a look at it and read the comments to get an idea of what it can do you for you, if you use Vim.  I told a few others what this script can do, and their professional lives have improved significantly.
 
 Other useful things I use on a daily basis in the bin directory:
 
