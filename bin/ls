@@ -3,8 +3,22 @@
 use strict;
 use v5.10.0;
 
-# to get the maximum benefit of this script, set aliases that are typos of ls, and include this one too:
+# Purpose:  To make my shell much more pleasant by being far more forgiving if I spell "ls" incorrectly.
+#           The reason for this script and not just aliases is it can parse mistakes where the spacebar
+#           was used incorrectly, or the arguments to 'ls' themselves.
+
+# Application: To get the maximum benefit of this script, set aliases that are typos of ls, and include this one too:
 # alias 'ls-'='ls --hyphen_first_arg'
+
+# Other useful aliases to try out:
+# alias 1ls='ls'
+# alias LS='ls'
+# alias ks='ls'
+# alias lks='ls'
+# alias lls='ls'
+# alias los='ls'
+# alias s='ls'
+# alias sl='ls'
 
 my @args_to_ls;
 my $flag_hyphen_first_arg;
