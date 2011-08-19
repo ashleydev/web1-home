@@ -1,3 +1,8 @@
+# Purpose:  this script brings colour coding and alias searching to which
+
+# How to use:  set up the following alias
+# alias which='. ~/bin/which_helper_partA.sh'
+
 if [ -n "$1" ] ; then
   
   if [ -f "/home/sjohnson/bin/which_helper_partB.pl" ] ; then
