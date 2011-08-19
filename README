@@ -18,7 +18,7 @@ fingerprint - quickly retrieve the fingerprint info from most systems, instead o
 get         - hexidecimal / decimal converter and diagnostic tool.  I used this very often trying to
               reverse engineer an MSN encryption application
 hl          - similar to grep, but highlights a query so you can see the entire context still
-killme      - good for killing everything but your current shell.  useful when the shit hits the
+killme      - good for killing everything but your current shell.  useful when the #$!% hits the
               fan via a shell infinite loop.  (not perfect, but good enough)
 lc / uc     - lowercase / uppercase STDIN or a file
 lg          - line grabber, useful for grabbing lines from STDIN or a file via ranges, integers, etc
