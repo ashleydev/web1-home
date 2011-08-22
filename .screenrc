@@ -15,3 +15,5 @@ startup_message off
 
 # experiment with 8-bit colours
 #term screen-256color
+
+altscreen on
