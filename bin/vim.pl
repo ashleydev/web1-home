@@ -7,7 +7,7 @@ use Cwd qw(realpath);
 use File::Basename;
 use Data::Dumper;
 
-my $flag_debug = 0; # used to print out verbose details while this script runs
+my $flag_debug;
 
 my @vim_files;
 my @vim_args;
@@ -17,6 +17,7 @@ my $flag_stdin;
 my $flag_switch_screen;
 my $time_switch_screen_warn;
 my $flag_switch_screen_warning;
+my $flag_no_file_manager;
 
 my @permission_hashrefs;
 
@@ -28,27 +29,30 @@ Section A) Why this script was created:
 - Hated being told by Vim that I was accidently piping something to it without the - argument.
 - Hated piping something from vim to something like grep, and seeing all the garbage on the screen from this mistake.
 - Hated being prompted with a question that someone else is editing a file.  "Then don't edit it, then!  Quit asking me!" is the attitude I have.
-- Hated being told I was editing a file already in a different GNU screen window.  Then switch the goddamn window for me! (optional switch in this script)
+- Hated being told I was editing a file already in a different GNU screen window.  Then switch the goddamn window for me! (optional switch)
 - Hated editing a file, THEN being told I didn't have permission to edit it in the first place.  Now you can specify directories and which group to set the write to.
 - Hated that grep's -n argument to also print which line of the file wasn't enough to tell vim to edit a file on that line if you copy and paste it with your mouse.
 - Hated accidently putting a space in the filename and having vim tell me that there were "2 more files to edit" all the time.
-- Hated editing a directory by accident cause of auto complete and it firing it up its file manager.
+- Hated editing a directory by accident cause of auto complete and it firing it up its file manager. (optional switch)
 - Hated using the up-arrow and executing a command like this, because I forgot to remove the previous command:   vi md5sum /some/file.  Now it will edit it.
 - Hated git diff which used a/ & b/ paths and having to convert them back to real filenames.  Now you can edit them as is!
 
-  Now, I realize that it's probably possible to do the vim screen switching via Vim itself (maybe with a script), but it would take me longer to find it, and get it working,
-  and likely it wouldn't work the way I want.  I find writing a front-end gives you complete control.
+Now, I realize that it's probably possible to do the vim screen switching via Vim itself (maybe with a script), but it would take me longer to find it, and get it working,
+and likely it wouldn't work the way I want.  I find writing a front-end gives you complete control.
 
 
 Section B) Features and how to use them:
 ========================================
 
+Section I) Advanced way.  These steps explain how to create a bootstrapper so you can keep your arguments specified if you write another script to edit files for you,
+	   using system($ENV{EDITOR}, $file);
+
 1. Step put this script somewhere, and record the absolute path.  It doesn't need to be in the PATH.
 
 2. Write a .sh bootstrapper script to fire up this perl script.  I use the file /home/sjohnson/vi_perl_starter.sh.  This also doesn't need to be in the PATH.
-   The contents of this file look something like this:
+   The contents of this file look something like this (you do not need to enable as many features as this example):
 
-   exec perl /home/sjohnson/bin/vim.pl --group-write=wheel /home/something/important --group-write=www-data /home/other/stuff --switch-screen=1 "$@"
+   exec perl /home/sjohnson/bin/vim.pl --no-file-manager --group-write=wheel /home/something/important --group-write=www-data /home/other/stuff --switch-screen=1 "$@"
 
 3. Edit your .bashrc (or .bash_aliases, whichever you prefer) and add the following export, changing it to suit your own absolute path, of course:
 
@@ -62,6 +66,10 @@ Section B) Features and how to use them:
 
 5. Re-execute your new bash settings, and get to work!
 
+Section II) Simple way.  Just add an alias of vi to point to the vim.pl script.  The only downside to this is if you have other scripts that fire up vi for you,
+	    they will not be ran due to system('vi', $file) not being able to read an alias.  Even if it did, it wouldn't execute your favourite arguments
+	    of this script itself.
+
 
 Section C) Explanation of the arguments, and common uses:
 =========================================================
@@ -74,6 +82,12 @@ warn you that the file you are editing does not have write permission, and ask y
 
 --switch-screen(=seconds in integer)
 enable the feature to switch your GNU screen window for you.  Ignore the equal-sign and integer to instantly switch it for you.  Note that this uses perl's sleep() function, so decimal numbers are not supported.
+
+--no-file-manager
+prevent Vim's file manager to fire up when you accidently edited a directory
+
+--debug
+enable a very verbose printing of what is taking place during script execution
 
 Examples of other features:
 
@@ -109,44 +123,56 @@ if (! -t STDOUT) {
   exit(1);
 }
 
-# scan for debug arg first, since regular @ARGV parsing will undef arguments
+# copy original @ARGV array, because it will be modified now and later.
+my @original_argv = @ARGV;
+
+# scan only for --debug first
 foreach (@ARGV) {
-  if (! $flag_debug && $_ eq '--debug') {
+  when ('--debug') {
     $flag_debug = 1;
-
-    # copy original @ARGV array, because it will be modified now and later.
-    my @original_argv = @ARGV;
-
-    # get rid of @ARGV's --debug flag, now that it has been processed.
+    say "debug mode enabled";
     $_ = undef;
-
-    # display all ARGV originals
-    my $i = 0;
-    printList('original ARGVs', @original_argv);
   }
 }
+
+if ($flag_debug) {
+  # display all ARGV originals
+  printList('original ARGVs', @original_argv);
+}
+
+# scan for "no file manager" feature
+foreach (@ARGV) {
+  when ('--no-file-manager') {
+    $flag_no_file_manager = 1;
+    say "feature enabled: no file manager" if $flag_debug;
+    $_ = undef;
+  }
+}
+
 
 # counter to process @ARGVs.  starts at -1 so that the first iteration of the foreach loop increases it to start it off at 0.
 my $i = -1;
 my $allow_next_argv;
+
+say 'Processing filtered @ARGVs...' if $flag_debug;
 
 foreach (@ARGV) {
   ++$i;
 
   next if ! defined;
 
-  say "after defined check, arg: [$_]" if $flag_debug;
+  say "on arg: [$_]" if $flag_debug;
 
   my ($pre_colon, $post_colon) = split(/:/);
 
   if ($allow_next_argv) {
     push(@vim_args, $_);
     undef $allow_next_argv;
-  } elsif (-d $_) {
+  } elsif ($flag_no_file_manager && -d $_) {
     # disallow directories
     say "$_ is a directory.";
     exit(1);
-  } elsif (-d $pre_colon) {
+  } elsif ($flag_no_file_manager && -d $pre_colon) {
     say "$pre_colon is a directory.";
     exit(1);
   } elsif ($_ eq '--switch-screen-warning') {
